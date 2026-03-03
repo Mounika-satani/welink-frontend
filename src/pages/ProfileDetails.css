@@ -1,0 +1,343 @@
+.profile-page {
+    background-color: var(--bg-main, #0D0E15);
+    min-height: 100vh;
+    padding-top: 90px;
+    padding-bottom: 60px;
+    font-family: 'Inter', sans-serif;
+    color: var(--color-white, #fff);
+}
+
+/* ── Avatar ── */
+.profile-avatar-wrapper {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 0.4rem;
+}
+
+/* Upload overlay — hidden, no longer used */
+.profile-avatar-overlay {
+    display: none;
+}
+
+.profile-avatar-wrapper:hover .profile-avatar-overlay {
+    opacity: 0;
+}
+
+/* ── Photo action buttons (below avatar) ── */
+.profile-photo-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px auto 4px;
+}
+
+.profile-photo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(29, 168, 250, 0.35);
+    background: rgba(29, 168, 250, 0.1);
+    color: #1DA8FA;
+    transition: background 0.18s, border-color 0.18s, transform 0.12s;
+    letter-spacing: 0.2px;
+}
+
+.profile-photo-btn:hover:not(:disabled) {
+    background: rgba(29, 168, 250, 0.2);
+    border-color: rgba(29, 168, 250, 0.6);
+    transform: scale(1.04);
+}
+
+.profile-photo-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.profile-photo-btn--remove {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+}
+
+.profile-photo-btn--remove:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.55);
+}
+
+.profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 4px rgba(29, 168, 250, 0.25);
+    display: block;
+}
+
+/* Upload spinner inside overlay */
+.profile-upload-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+/* Hint below avatar */
+.profile-avatar-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.8rem;
+    margin-top: 0;
+}
+
+/* Upload feedback message */
+.profile-upload-msg {
+    font-size: 0.82rem;
+    color: #9ca3af;
+    margin: 0.3rem 0 0.2rem;
+    min-height: 1.2em;
+}
+
+.profile-avatar-fallback {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1DA8FA, #805BED);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 4px rgba(29, 168, 250, 0.25);
+}
+
+/* ── Card ── */
+.profile-card {
+    background: #13141f;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.profile-card:hover {
+    border-color: rgba(29, 168, 250, 0.2);
+}
+
+.profile-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    color: #fff;
+}
+
+.profile-email {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-bottom: 1.2rem;
+    word-break: break-all;
+}
+
+/* ── Badges ── */
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin: 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-role {
+    background: rgba(29, 168, 250, 0.12);
+    color: #1DA8FA;
+    border: 1px solid rgba(29, 168, 250, 0.25);
+}
+
+.badge-active {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.badge-inactive {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── Divider ── */
+.profile-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin: 1.5rem 0;
+}
+
+/* ── Info rows ── */
+.profile-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 1rem;
+}
+
+.profile-info-row:last-child {
+    border-bottom: none;
+}
+
+.profile-info-label {
+    font-size: 0.82rem;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.profile-info-value {
+    font-size: 0.92rem;
+    color: #e5e7eb;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-all;
+}
+
+/* ── Section title ── */
+.profile-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+/* ── Startup card ── */
+.profile-startup-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    transition: background 0.25s, border-color 0.25s;
+}
+
+.profile-startup-card:hover {
+    background: rgba(29, 168, 250, 0.06);
+    border-color: rgba(29, 168, 250, 0.25);
+}
+
+.profile-startup-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(29, 168, 250, 0.2), rgba(128, 91, 237, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.3rem;
+}
+
+.profile-startup-name {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.profile-startup-sub {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* ── Loading / Error ── */
+.profile-loading,
+.profile-error {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+.profile-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #1DA8FA;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Gradient text ── */
+.profile-gradient-text {
+    background: linear-gradient(90deg, #1DA8FA, #805BED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── Edit button ── */
+.profile-edit-btn {
+    background: linear-gradient(139.29deg, #1DA8FA 6.45%, #805BED 100%);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 1.2rem;
+}
+
+.profile-edit-btn:hover {
+    opacity: 0.88;
+}
+
+.profile-edit-btn:active {
+    transform: scale(0.97);
+}
+
+/* ── No startup placeholder ── */
+.profile-no-startup {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,102 @@
+.featured-startups-section {
+    background-color: var(--bg-main);
+    color: var(--color-white);
+}
+
+.view-all-link {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.view-all-link:hover {
+    opacity: 1;
+    color: var(--color-primary) !important;
+}
+
+.startup-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.main-card {
+    height: 500px;
+}
+
+.small-card {
+    height: 240px;
+}
+
+.card-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.startup-card:hover .card-bg-img {
+    transform: scale(1.05);
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    z-index: 2;
+}
+
+.card-tags {
+    display: flex;
+    align-items: flex-start;
+}
+
+.custom-badge {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background: rgba(43, 43, 43, 0.4) !important;
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.card-content {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.startup-name {
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.startup-description {
+    margin-bottom: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    max-width: 90%;
+}
+
+@media (max-width: 991px) {
+    .main-card {
+        height: 400px;
+        margin-bottom: 0;
+    }
+
+    .small-card {
+        height: 200px;
+    }
+}

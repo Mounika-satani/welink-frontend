@@ -1,0 +1,601 @@
+.startup-details-page {
+    background-color: var(--bg-main);
+    color: var(--color-white);
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.banner-bg {
+    height: 300px;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(13, 14, 21, 1)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1600') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    padding: 20px;
+}
+
+.btn-back {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+}
+
+.content-container {
+    margin-top: -80px;
+    position: relative;
+    z-index: 10;
+}
+
+.profile-card {
+    background-color: #12131C;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.startup-logo-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.details-badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+}
+
+.badge-featured {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+}
+
+.details-title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-visit {
+    background-color: var(--color-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0 24px;
+    border-radius: 8px;
+}
+
+.info-section {
+    background-color: #12131C;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 32px;
+}
+
+.sub-head {
+    color: var(--color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.section-head {
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.text-body-secondary {
+    color: #9ca3af !important;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+
+.founder-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.founder-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.founder-role {
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.link-item {
+    color: var(--color-secondary);
+    font-size: 0.9rem;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.link-item:last-child {
+    border-bottom: none;
+}
+
+.link-item:hover {
+    color: white;
+}
+
+.gallery-main-img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gallery-nav-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.gallery-btn {
+    pointer-events: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gallery-btn:hover {
+    background-color: black;
+    border-color: white;
+}
+
+.related-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+}
+
+.badge-details {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Sidebar Card Adjustments */
+.sidebar-card.info-section {
+    padding: 20px;
+}
+
+.sidebar-card .section-head {
+    font-size: 1.15rem;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+.sidebar-card .founder-img {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+}
+
+.sidebar-card .founder-name {
+    font-size: 0.85rem;
+}
+
+.sidebar-card .founder-role {
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+}
+
+.sidebar-card .founder-bio {
+    font-size: 0.7rem;
+    line-height: 1.3;
+}
+
+.sidebar-card .link-item {
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+.sidebar-card .link-item svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Instagram Grid Styles */
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    /* Instagram uses small gaps */
+    margin-top: 10px;
+}
+
+.ig-item {
+    cursor: pointer;
+    position: relative;
+}
+
+.ig-square {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #000;
+    overflow: hidden;
+}
+
+.ig-square img,
+.ig-square video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ig-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #1e293b, #0f172a);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.ig-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+    color: white;
+    font-weight: 700;
+}
+
+.ig-item:hover .ig-overlay {
+    opacity: 1;
+}
+
+.ig-multi-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.ig-video-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Modal Styling */
+.ig-modal-content {
+    background-color: #000 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+.ig-details-modal .modal-dialog {
+    max-width: 1100px;
+    width: 95%;
+}
+
+.ig-custom-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+.ig-custom-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ig-custom-scroll::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.82);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: #000;
+}
+
+.carousel-arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.carousel-arrow.left {
+    left: 12px;
+}
+
+.carousel-arrow.right {
+    right: 12px;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+.indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s;
+}
+
+.indicator-dot.active {
+    background: #fff;
+    transform: scale(1.15);
+}
+
+@media (max-width: 991px) {
+    .instagram-grid {
+        gap: 2px;
+    }
+
+    .ig-details-modal .modal-dialog {
+        width: 100%;
+        margin: 0;
+    }
+
+    .ig-modal-content {
+        height: 100vh;
+        border-radius: 0 !important;
+    }
+}
+
+
+/* ── Post Action Row (Edit + Delete side-by-side) ───────────────────── */
+.ig-action-row {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.ig-action-btn {
+    background: transparent !important;
+    border: none !important;
+    padding: 0;
+    margin: 0;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
+    transition: transform 0.18s ease, color 0.15s;
+}
+
+.ig-action-btn:hover {
+    color: #0ea5e9;
+    transform: scale(1.15);
+}
+
+.ig-action-delete:hover {
+    color: #ef4444 !important;
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.55));
+}
+
+
+
+/* ── PENDING badge on grid tile ─────────────────────────────────────── */
+.ig-pending-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(245, 158, 11, 0.92);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+    animation: pending-pulse 2s infinite;
+}
+
+@keyframes pending-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+/* ── Edit Post Modal ─────────────────────────────────────────────────── */
+.edit-post-modal-content {
+    background-color: #0d0e15 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+}
+
+.edit-post-modal-content .btn-close {
+    filter: invert(1);
+}
+
+/* ── Media thumbnail strip ───────────────────────────────────────────── */
+.edit-media-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.edit-media-thumb {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.edit-media-thumb.new {
+    border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.3);
+}
+
+.edit-media-thumb img,
+.edit-media-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edit-media-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    border: none;
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.edit-media-remove:hover {
+    background: #dc2626;
+}
+
+/* ── Add Media button ─────────────────────────────────────────────────── */
+.edit-add-media-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.edit-add-media-btn:hover {
+    background: rgba(14, 165, 233, 0.08);
+    border-color: rgba(14, 165, 233, 0.4);
+    color: #0ea5e9;
+}

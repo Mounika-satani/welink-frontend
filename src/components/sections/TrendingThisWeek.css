@@ -1,0 +1,87 @@
+.trending-section {
+    background-color: var(--bg-main);
+    color: var(--color-white);
+}
+
+.trending-card {
+    height: 380px !important;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.trending-card:hover {
+    transform: translateY(-5px);
+}
+
+.trending-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.trending-card:hover .trending-img {
+    transform: scale(1.05);
+}
+
+.trending-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+}
+
+.rank-badge {
+    width: 40px;
+    height: 40px;
+    background: #000;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.stat-badge {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+}
+
+.hot-tag {
+    color: var(--color-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trending-carousel .carousel-control-prev,
+.trending-carousel .carousel-control-next {
+    width: 4%;
+}
+
+.trending-carousel .carousel-control-prev-icon,
+.trending-carousel .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 15px;
+    background-size: 50%, 50%;
+}

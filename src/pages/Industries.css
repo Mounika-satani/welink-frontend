@@ -1,0 +1,119 @@
+.industries-page {
+    background-color: var(--bg-main);
+    color: var(--color-white);
+    min-height: 100vh;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.industries-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.industries-header p {
+    color: var(--color-text-muted, #aaa);
+    font-size: 0.95rem;
+    max-width: 600px;
+}
+
+.industry-grid-card {
+    height: 350px !important;
+    max-height: 350px !important;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none !important;
+    background: #1a1b23;
+}
+
+.industry-grid-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.industry-bg-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    opacity: 0.6;
+    /* Dim the image initially */
+}
+
+.industry-grid-card:hover .industry-bg-img {
+    transform: scale(1.05);
+    opacity: 0.4;
+    /* darken image slightly on hover for better text readability if needed, or keep it consistent */
+}
+
+.industry-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+}
+
+.industry-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+    /* slightly loose circle or rounded rect */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.industry-icon-wrapper svg {
+    color: #e94e77;
+    /* Pinkish color from image */
+}
+
+.industry-content {
+    margin-top: auto;
+}
+
+.industry-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.industry-desc {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    max-width: 90%;
+}
+
+.industry-link {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #3b82f6;
+    /* Blue link color */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s ease;
+}
+
+.industry-grid-card:hover .industry-link {
+    gap: 8px;
+    color: #60a5fa;
+}

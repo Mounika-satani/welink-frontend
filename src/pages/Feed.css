@@ -1,0 +1,539 @@
+/* ═══════════════════════════════════════════════════════════
+   YouTube Shorts-style Feed  ·  Feed.css
+   Uses .yt-* namespacing so nothing leaks to other pages.
+════════════════════════════════════════════════════════════ */
+
+/* ── Scroll container: fills main (100% height, given by FeedLayout) ── */
+.yt-feed {
+    width: 100%;
+    height: 100%;
+    /* FeedLayout <main> is flex:1, overflow:hidden */
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.yt-feed::-webkit-scrollbar {
+    display: none;
+}
+
+/* ── One snap slot = one full screen ── */
+.yt-snap-item {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARD  =  [  portrait media  ]  [ side buttons ]
+   Centred on screen, never wider than the viewport.
+════════════════════════════════════════════════════════════ */
+.yt-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    /* height + width are driven by --yt-h / --yt-w set below */
+    height: calc(100% - 20px);
+    /* small top/bottom breathing room */
+    padding: 0;
+    position: relative;
+}
+
+/* Portrait media block: 9:16 ratio, full height */
+.yt-media {
+    /* portrait: width = height × (9/16) */
+    width: calc((100vh - 80px) * 0.5625);
+    /* approx nav offset */
+    max-width: min(390px, calc(100vw - 90px));
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #111;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+}
+
+/* media fills the box */
+.yt-media-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.yt-no-media {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #111 0%, #1a1a2e 100%);
+}
+
+/* bottom-to-top dark gradient so text is legible */
+.yt-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.95) 0%,
+            rgba(0, 0, 0, 0.55) 35%,
+            transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ── Top control bar (pause / mute / more) ── */
+.yt-top-bar {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 5;
+}
+
+.yt-ctrl,
+.yt-menu-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.2s;
+}
+
+.yt-ctrl:hover,
+.yt-menu-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* big play icon when paused */
+.yt-pause-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+/* ── Bottom info overlay ── */
+.yt-bottom-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 16px 24px;
+    z-index: 3;
+}
+
+.yt-startup-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-bottom: 12px;
+}
+
+.yt-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+}
+
+.yt-startup-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.yt-startup-tag {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.yt-post-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    line-height: 1.3;
+}
+
+.yt-post-content {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.yt-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.yt-post-type {
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #ff3366;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: rgba(255, 51, 102, 0.15);
+    border: 1px solid rgba(255, 51, 102, 0.35);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.yt-link {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #38bdf8;
+    text-decoration: none;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 2px 10px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.yt-link:hover {
+    background: rgba(56, 189, 248, 0.25);
+    color: #7dd3fc;
+}
+
+.yt-link-alt {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.12);
+    border-color: rgba(167, 139, 250, 0.3);
+}
+
+.yt-link-alt:hover {
+    background: rgba(167, 139, 250, 0.25);
+    color: #c4b5fd;
+}
+
+/* ── Comments drawer inside media ── */
+.yt-comments-drawer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 65%;
+    background: rgba(8, 8, 14, 0.97);
+    backdrop-filter: blur(24px);
+    border-radius: 16px 16px 14px 14px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+}
+
+.yt-comments-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.yt-comments-close {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.yt-comments-close:hover {
+    color: #fff;
+}
+
+.yt-comments-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.yt-comments-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.yt-comments-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RIGHT SIDE ACTION PANEL  — YouTube Shorts circles
+════════════════════════════════════════════════════════════ */
+.yt-actions-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 22px;
+    padding-bottom: 28px;
+    flex-shrink: 0;
+    width: 64px;
+}
+
+.yt-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    padding: 0;
+    transition: transform 0.15s ease;
+}
+
+.yt-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.yt-action-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.yt-action-btn:hover .yt-action-circle {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* Active states via CSS variable */
+.yt-action-btn[data-active] .yt-action-circle {
+    background: color-mix(in srgb, var(--act-color, #22c55e) 25%, transparent);
+    border-color: color-mix(in srgb, var(--act-color, #22c55e) 50%, transparent);
+    color: var(--act-color, #22c55e);
+}
+
+.yt-action-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+}
+
+/* ── Loading / empty states ── */
+.yt-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    height: 100%;
+    width: 100%;
+    color: #666;
+}
+
+.yt-spinner {
+    width: 42px;
+    height: 42px;
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top-color: #ff3366;
+    border-radius: 50%;
+    animation: ytSpin 0.8s linear infinite;
+}
+
+@keyframes ytSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.yt-discover-btn {
+    padding: 10px 26px;
+    background: linear-gradient(135deg, #ff3366, #a855f7);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+}
+
+.yt-discover-btn:hover {
+    opacity: 0.85;
+    color: #fff;
+}
+
+/* ── Mobile: full bleed ── */
+@media (max-width: 500px) {
+    .yt-card {
+        gap: 0;
+    }
+
+    .yt-media {
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+    }
+
+    .yt-actions-panel {
+        position: absolute;
+        right: 10px;
+        bottom: 120px;
+        z-index: 6;
+        padding-bottom: 0;
+        gap: 14px;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MEDIA CAROUSEL  — Instagram-style inside the Shorts card
+════════════════════════════════════════════════════════════ */
+.media-carousel {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.media-carousel .yt-media-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Arrow buttons ── */
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.carousel-arrow:hover {
+    background: rgba(0, 0, 0, 0.82);
+}
+
+.carousel-prev {
+    left: 12px;
+}
+
+.carousel-next {
+    right: 12px;
+}
+
+/* ── Dot indicators ── */
+.carousel-dots {
+    position: absolute;
+    bottom: 72px;
+    /* sits above the bottom info overlay */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 5;
+}
+
+.carousel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.carousel-dot.active {
+    background: #fff;
+    transform: scale(1.25);
+}
+
+/* ── Slide counter (top-right) ── */
+.carousel-counter {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    z-index: 5;
+}
+
+/* ── Comments-off badge ── */
+.yt-comments-off-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+}
