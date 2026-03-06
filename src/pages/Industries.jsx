@@ -4,11 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllCategories } from '../service/category';
 import './Industries.css';
 
-const Icon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-    </svg>
-);
+
 
 const Industries = () => {
     const navigate = useNavigate();
@@ -75,11 +71,7 @@ const Industries = () => {
                                         <div className="industry-bg-placeholder" />
                                     )}
                                     <div className="industry-overlay">
-                                        <div className="d-flex justify-content-between align-items-start w-100">
-                                            <div className="industry-icon-wrapper">
-                                                <Icon />
-                                            </div>
-                                        </div>
+
 
                                         <div className="industry-content">
                                             <h3 className="industry-title text-truncate">{category.name}</h3>

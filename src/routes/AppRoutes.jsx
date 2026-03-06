@@ -14,6 +14,7 @@ import StartupDetails from "../pages/StartupDetails";
 import SubmitStartup from "../pages/SubmitStartup";
 import ProfileDetails from "../pages/ProfileDetails";
 import MyStartupDetails from "../pages/MyStartupDetails";
+import Help from "../pages/Help";
 
 const AppRoutes = () => {
     return (
@@ -35,6 +36,7 @@ const AppRoutes = () => {
                     <Route path="/submit-startup" element={<SubmitStartup />} />
                     <Route path="/profile" element={<ProfileDetails />} />
                     <Route path="/my-startup" element={<MyStartupDetails />} />
+                    <Route path="/help" element={<Help />} />
                 </Route>
             </Route>
         </Routes>

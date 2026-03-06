@@ -86,7 +86,6 @@ const StartupDetails = () => {
             setSelectedPost(prev => ({
                 ...prev,
                 total_upvotes: data.upvotes,
-                total_downvotes: data.downvotes,
                 userVote: data.userVote
             }));
 
@@ -95,7 +94,6 @@ const StartupDetails = () => {
                 posts: prev.posts.map(p => p.id === post_id ? {
                     ...p,
                     total_upvotes: data.upvotes,
-                    total_downvotes: data.downvotes
                 } : p)
             }));
         } catch (err) {
@@ -119,7 +117,6 @@ const StartupDetails = () => {
         }
     };
 
-    // Reset index when modal opens/changes
     useEffect(() => {
         setCurrentMediaIndex(0);
     }, [selectedPost]);
@@ -180,7 +177,14 @@ const StartupDetails = () => {
 
     return (
         <div className="startup-details-page">
-            <div className="banner-bg">
+            <div
+                className="banner-bg"
+                style={startup?.banner_url ? {
+                    backgroundImage: `linear-gradient(rgba(0,0,0,0.25), rgba(13,14,21,1)), url(${startup.banner_url})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                } : undefined}
+            >
                 <Button variant="dark" className="btn-back" as={Link} to="/discover">
                     <BackArrow /> Back to Discover
                 </Button>
@@ -456,14 +460,7 @@ const StartupDetails = () => {
                                                 <svg width="22" height="22" viewBox="0 0 24 24" fill={selectedPost.userVote === 1 ? "#198754" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z" /></svg>
                                                 <span className="small fw-bold text-success">{selectedPost.total_upvotes || 0}</span>
                                             </div>
-                                            <div
-                                                className="d-flex align-items-center gap-1"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleVote(selectedPost.id, -1)}
-                                            >
-                                                <svg width="22" height="22" viewBox="0 0 24 24" fill={selectedPost.userVote === -1 ? "#dc3545" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" /></svg>
-                                                <span className="small fw-bold text-danger">{selectedPost.total_downvotes || 0}</span>
-                                            </div>
+
 
                                         </div>
                                     </div>

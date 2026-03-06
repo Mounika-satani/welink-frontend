@@ -24,7 +24,6 @@ function authorLabel(author) {
 const CommentVoteBar = ({ comment, dbUser, token }) => {
     const [voting, setVoting] = useState(false);
     const [localUp, setLocalUp] = useState(comment.upvotes ?? 0);
-    const [localDown, setLocalDown] = useState(comment.downvotes ?? 0);
     const [userVote, setUserVote] = useState(comment.userVote ?? null);
 
     const handleVote = useCallback(async (voteType) => {
@@ -33,7 +32,6 @@ const CommentVoteBar = ({ comment, dbUser, token }) => {
         try {
             const data = await voteComment(token, comment.id, voteType);
             setLocalUp(data.upvotes ?? localUp);
-            setLocalDown(data.downvotes ?? localDown);
             setUserVote(data.userVote ?? null);
         } catch (err) {
             console.error('Comment vote failed:', err);
@@ -50,38 +48,21 @@ const CommentVoteBar = ({ comment, dbUser, token }) => {
                 disabled={!dbUser || voting || comment.status === 'HIDDEN'}
                 title={dbUser ? 'Upvote' : 'Login to vote'}
             >
-                <svg width="12" height="12" viewBox="0 0 24 24"
-                    fill={userVote === 1 ? 'currentColor' : 'none'}
+                <svg width="16" height="16" viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
-                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                    <path d="M12 19V5M12 5L5 12M12 5L19 12" />
                 </svg>
                 <span>{localUp}</span>
             </button>
 
-            <div className="comment-vote-sep" />
 
-            <button
-                className={`comment-vote-btn ${userVote === -1 ? 'down-active' : ''}`}
-                onClick={() => handleVote(-1)}
-                disabled={!dbUser || voting || comment.status === 'HIDDEN'}
-                title={dbUser ? 'Downvote' : 'Login to vote'}
-            >
-                <svg width="12" height="12" viewBox="0 0 24 24"
-                    fill={userVote === -1 ? 'currentColor' : 'none'}
-                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
-                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-                </svg>
-                <span>{localDown}</span>
-            </button>
         </div>
     );
 };
 
 /* ── Main CommentsSection ─────────────────────── */
 const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
-    const [open, setOpen] = useState(false);
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [text, setText] = useState('');
@@ -91,7 +72,6 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
 
     /* Fetch on first open — owners get all (incl. hidden), others get active only */
     useEffect(() => {
-        if (!open) return;
         setLoading(true);
         const fetchFn = isOwner
             ? getAllComments(token, postId)
@@ -101,7 +81,7 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
             .then(setComments)
             .catch(() => { })
             .finally(() => setLoading(false));
-    }, [open, postId, isOwner]);
+    }, [postId, isOwner, token, dbUser?.id]);
 
     const handleSubmit = async () => {
         if (!text.trim() || posting) return;
@@ -160,133 +140,130 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
 
     return (
         <div className="comments-section">
-            {/* Toggle bar */}
-            <button className="comments-toggle-btn" onClick={() => setOpen(o => !o)}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                {open ? 'Hide comments' : 'Comments'}
-                <span className="comments-count-badge">
-                    {open
-                        ? (isOwner && hiddenCount > 0 ? `${activeCount} active · ${hiddenCount} hidden` : activeCount)
-                        : (comments.length > 0 ? comments.length : '…')}
-                </span>
-            </button>
-
-            {open && (
-                <div className="comments-body">
-                    {/* Input */}
-                    {dbUser ? (
-                        <div className="comment-input-row">
-                            <textarea
-                                className="comment-input"
-                                placeholder="Write a comment…"
-                                value={text}
-                                onChange={e => setText(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                rows={1}
-                            />
-                            <button
-                                className="comment-submit-btn"
-                                onClick={handleSubmit}
-                                disabled={!text.trim() || posting}
-                            >
-                                {posting ? '…' : 'Post'}
-                            </button>
+            <div className="comments-body">
+                {/* Input */}
+                {dbUser ? (
+                    <div className="comment-input-row">
+                        <div className="comment-input-avatar-container">
+                            {dbUser.photo_url ? (
+                                <img src={dbUser.photo_url} className="comment-avatar-small" alt="My Profile" />
+                            ) : (
+                                <div className="comment-avatar-small comment-avatar-fallback">
+                                    {(dbUser.name || dbUser.email || 'U')[0].toUpperCase()}
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <p className="comment-login-hint">Login to post a comment</p>
-                    )}
+                        <textarea
+                            className="comment-input"
+                            placeholder="Write a comment…"
+                            value={text}
+                            onChange={e => setText(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            rows={1}
+                        />
+                        <button
+                            className="comment-submit-btn"
+                            onClick={handleSubmit}
+                            disabled={!text.trim() || posting}
+                        >
+                            {posting ? '…' : 'Post'}
+                        </button>
+                    </div>
+                ) : (
+                    <p className="comment-login-hint">Login to post a comment</p>
+                )}
 
-                    {/* Comment list */}
-                    {loading ? (
-                        <p className="comments-loading">Loading comments…</p>
-                    ) : comments.length === 0 ? (
-                        <p className="comments-empty">No comments yet. Be the first!</p>
-                    ) : (
-                        <div className="comment-list">
-                            {comments.map(comment => {
-                                const isHidden = comment.status === 'HIDDEN';
-                                const isAuthor = dbUser?.id === comment.user_id;
-                                const canDelete = isOwner || isAuthor;
-                                const canHide = isOwner && !isHidden;
-                                const canRestore = isOwner && isHidden;
+                {/* Comment list */}
+                {loading ? (
+                    <p className="comments-loading">Loading comments…</p>
+                ) : comments.length === 0 ? (
+                    <p className="comments-empty">No comments yet. Be the first!</p>
+                ) : (
+                    <div className="comment-list">
+                        {comments.map(comment => {
+                            const isHidden = comment.status === 'HIDDEN';
+                            const isAuthor = dbUser?.id === comment.user_id;
+                            const canDelete = isOwner || isAuthor;
+                            const canHide = isOwner && !isHidden;
+                            const canRestore = isOwner && isHidden;
 
-                                return (
-                                    <div
-                                        key={comment.id}
-                                        className={`comment-item ${isHidden ? 'comment-item--hidden' : ''}`}
-                                    >
-                                        {/* Hidden notice banner — only startup owner sees this */}
-                                        {isHidden && isOwner && (
-                                            <div className="comment-hidden-banner">
-                                                🚫 Hidden from public — only you can see this
-                                            </div>
-                                        )}
+                            return (
+                                <div
+                                    key={comment.id}
+                                    className={`comment-item ${isHidden ? 'comment-item--hidden' : ''}`}
+                                >
+                                    {/* Hidden notice banner — only startup owner sees this */}
+                                    {isHidden && isOwner && (
+                                        <div className="comment-hidden-banner">
+                                            🚫 Hidden from public — only you can see this
+                                        </div>
+                                    )}
 
-                                        {/* Header */}
-                                        <div className="comment-header">
+                                    {/* Header */}
+                                    <div className="comment-header">
+                                        {comment.author?.photo_url ? (
                                             <img
                                                 className="comment-avatar"
-                                                src={comment.author?.photo_url ||
-                                                    `https://ui-avatars.com/api/?name=${authorLabel(comment.author)}&background=222&color=fff&size=64`}
+                                                src={comment.author.photo_url}
                                                 alt={authorLabel(comment.author)}
-                                                onError={e => { e.target.src = `https://ui-avatars.com/api/?name=U&background=222&color=fff&size=64`; }}
+                                                onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                                             />
-                                            <span className="comment-author-name">{authorLabel(comment.author)}</span>
-                                            <span className="comment-date">{timeAgo(comment.created_at || comment.createdAt)}</span>
+                                        ) : null}
+                                        <div className="comment-avatar-small comment-avatar-fallback" style={{ width: '24px', height: '24px', fontSize: '0.7rem', display: comment.author?.photo_url ? 'none' : 'flex' }}>
+                                            {authorLabel(comment.author)[0].toUpperCase()}
                                         </div>
-
-                                        {/* Text */}
-                                        <p className="comment-text">{comment.content}</p>
-
-                                        {/* Actions row: votes left, owner controls right */}
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <CommentVoteBar
-                                                comment={comment}
-                                                dbUser={dbUser}
-                                                token={token}
-                                            />
-                                            {(canHide || canRestore || canDelete) && (
-                                                <div className="comment-actions comment-owner-actions" style={{ marginTop: 0 }}>
-                                                    {canRestore && (
-                                                        <button
-                                                            className="comment-restore-btn"
-                                                            onClick={() => handleRestore(comment.id)}
-                                                            title="Make this comment visible again"
-                                                        >
-                                                            ↩ Restore
-                                                        </button>
-                                                    )}
-                                                    {canHide && (
-                                                        <button
-                                                            className="comment-hide-btn"
-                                                            onClick={() => handleHide(comment.id)}
-                                                            title="Hide this comment from public"
-                                                        >
-                                                            🚫 Hide
-                                                        </button>
-                                                    )}
-                                                    {canDelete && (
-                                                        <button
-                                                            className="comment-delete-btn"
-                                                            onClick={() => handleDelete(comment.id)}
-                                                            title="Permanently delete"
-                                                        >
-                                                            🗑 Delete
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <span className="comment-author-name">{authorLabel(comment.author)}</span>
+                                        <span className="comment-date">{timeAgo(comment.created_at || comment.createdAt)}</span>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-            )}
+
+                                    {/* Text */}
+                                    <p className="comment-text">{comment.content}</p>
+
+                                    {/* Actions row: votes left, owner controls right */}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <CommentVoteBar
+                                            comment={comment}
+                                            dbUser={dbUser}
+                                            token={token}
+                                        />
+                                        {(canHide || canRestore || canDelete) && (
+                                            <div className="comment-actions comment-owner-actions" style={{ marginTop: 0 }}>
+                                                {canRestore && (
+                                                    <button
+                                                        className="comment-restore-btn"
+                                                        onClick={() => handleRestore(comment.id)}
+                                                        title="Make this comment visible again"
+                                                    >
+                                                        ↩ Restore
+                                                    </button>
+                                                )}
+                                                {canHide && (
+                                                    <button
+                                                        className="comment-hide-btn"
+                                                        onClick={() => handleHide(comment.id)}
+                                                        title="Hide this comment from public"
+                                                    >
+                                                        🚫 Hide
+                                                    </button>
+                                                )}
+                                                {canDelete && (
+                                                    <button
+                                                        className="comment-delete-btn"
+                                                        onClick={() => handleDelete(comment.id)}
+                                                        title="Permanently delete"
+                                                    >
+                                                        🗑 Delete
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

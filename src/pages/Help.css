@@ -1,0 +1,120 @@
+/* =============================================
+   HELP PAGE LAYOUT
+   ============================================= */
+
+.help-page {
+    min-height: calc(100vh - 70px);
+    background: #0a0c13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+}
+
+.help-container {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 60px;
+    max-width: 1000px;
+    width: 100%;
+    align-items: start;
+}
+
+/* =============================================
+   LEFT INFO PANEL
+   ============================================= */
+
+.help-info {
+    padding-top: 12px;
+}
+
+.help-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 12px 0 16px;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #fff 55%, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.help-subtitle {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.75;
+    margin: 0 0 36px;
+}
+
+.help-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.help-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.help-contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+    flex-shrink: 0;
+}
+
+.help-contact-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+}
+
+.help-contact-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #e5e7eb;
+}
+
+/* =============================================
+   FORM CARD — override modal positioning
+   ============================================= */
+
+.help-form-card {
+    position: static !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    animation: none !important;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+
+@media (max-width: 768px) {
+    .help-container {
+        grid-template-columns: 1fr;
+        gap: 36px;
+    }
+
+    .help-title {
+        font-size: 2rem;
+    }
+
+    .help-page {
+        padding: 40px 16px;
+        align-items: flex-start;
+    }
+}

@@ -29,9 +29,8 @@ const AppNavbar = () => {
                             <Nav.Link as={NavLink} to="/" end>Home</Nav.Link>
                             <Nav.Link as={NavLink} to="/feed">Feed</Nav.Link>
                             <Nav.Link as={NavLink} to="/discover">Discover</Nav.Link>
-                            <Nav.Link as={NavLink} to="/trending">Trending</Nav.Link>
                             <Nav.Link as={NavLink} to="/industries">Industries</Nav.Link>
-                            <Nav.Link as={NavLink} to="/about">About</Nav.Link>
+                            <Nav.Link as={NavLink} to="/help">Help</Nav.Link>
                         </Nav>
 
                         <div className="d-flex align-items-center gap-3 navbar-actions">
@@ -93,6 +92,7 @@ const AppNavbar = () => {
                                         {dbUser?.role === 'STARTUP' && (
                                             <Dropdown.Item as={Link} to="/my-startup">My Startup</Dropdown.Item>
                                         )}
+                                        <Dropdown.Item as={Link} to="/about">About</Dropdown.Item>
                                         <Dropdown.Divider />
                                         <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
                                     </Dropdown.Menu>

@@ -4,12 +4,7 @@ import { Link } from 'react-router-dom';
 import { getTrendingStartups } from '../service/startup';
 import './Trending.css';
 
-// Helper — formats numbers like 12400 → "12.4k"
-const fmt = (n = 0) => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-    return String(n);
-};
+
 
 const Trending = () => {
     const [startups, setStartups] = useState([]);
@@ -110,23 +105,6 @@ const Trending = () => {
 
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <div className="d-flex gap-3 text-white-50 small fw-medium">
-
-                                                        {/* Views */}
-                                                        <span className="d-flex align-items-center gap-1">
-                                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                                <circle cx="12" cy="12" r="3"></circle>
-                                                            </svg>
-                                                            {fmt(metrics.total_views)}
-                                                        </span>
-
-                                                        {/* Upvotes */}
-                                                        <span className="d-flex align-items-center gap-1">
-                                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                                                            </svg>
-                                                            {fmt(metrics.total_upvotes)}
-                                                        </span>
                                                     </div>
 
                                                     <div className="arrow-icon">

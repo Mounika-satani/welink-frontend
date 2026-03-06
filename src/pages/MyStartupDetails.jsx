@@ -206,7 +206,6 @@ const MyStartupDetails = () => {
             setSelectedPost(prev => ({
                 ...prev,
                 total_upvotes: data.upvotes,
-                total_downvotes: data.downvotes,
                 userVote: data.userVote
             }));
 
@@ -215,7 +214,6 @@ const MyStartupDetails = () => {
                 posts: prev.posts.map(p => p.id === post_id ? {
                     ...p,
                     total_upvotes: data.upvotes,
-                    total_downvotes: data.downvotes
                 } : p)
             }));
         } catch (err) {
@@ -307,7 +305,14 @@ const MyStartupDetails = () => {
     return (
         <>
             <div className="startup-details-page">
-                <div className="banner-bg">
+                <div
+                    className="banner-bg"
+                    style={startup?.banner_url ? {
+                        backgroundImage: `linear-gradient(rgba(0,0,0,0.25), rgba(13,14,21,1)), url(${startup.banner_url})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    } : undefined}
+                >
                     <Link to="/profile" className="btn btn-dark btn-back d-inline-flex align-items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
@@ -448,7 +453,7 @@ const MyStartupDetails = () => {
                                     <Row className="g-3">
                                         {[
                                             { label: 'Upvotes', value: startup.metrics.total_upvotes ?? 0, color: '#10b981' },
-                                            { label: 'Downvotes', value: startup.metrics.total_downvotes ?? 0, color: '#ef4444' },
+
                                             { label: 'Views', value: startup.metrics.total_views ?? 0, color: '#0ea5e9' },
                                             { label: 'Trending Score', value: Number(startup.metrics.trending_score ?? 0).toFixed(3), color: '#f59e0b' },
                                         ].map(({ label, value, color }) => (
@@ -766,14 +771,7 @@ const MyStartupDetails = () => {
                                                     <svg width="22" height="22" viewBox="0 0 24 24" fill={selectedPost.userVote === 1 ? "#198754" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z" /></svg>
                                                     <span className="small fw-bold text-success">{selectedPost.total_upvotes || 0}</span>
                                                 </div>
-                                                <div
-                                                    className="d-flex align-items-center gap-1"
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => handleVote(selectedPost.id, -1)}
-                                                >
-                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill={selectedPost.userVote === -1 ? "#dc3545" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" /></svg>
-                                                    <span className="small fw-bold text-danger">{selectedPost.total_downvotes || 0}</span>
-                                                </div>
+
                                             </div>
 
                                             {/* ── Owner comments toggle ── */}

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getCategories, createStartup, addFounder, updateStartup, getMyStartup } from '../service/startup';
 import { API_URL } from '../service/api';
+import BannerCropper from '../components/BannerCropper';
 import './SubmitStartup.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -16,14 +17,18 @@ const SubmitStartup = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Edit mode: navigate to /submit-startup with { state: { editMode: true } }
     const editMode = location.state?.editMode === true;
 
     const [currentStep, setCurrentStep] = useState(1);
     const [categories, setCategories] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
-    const [startupId, setStartupId] = useState(null); // set in edit mode
+    const [startupId, setStartupId] = useState(null);
+
+    const [bannerRawSrc, setBannerRawSrc] = useState(null);
+    const [showCropper, setShowCropper] = useState(false);
+    const [bannerPreviewUrl, setBannerPreviewUrl] = useState(null);
+    const bannerInputRef = useRef();
 
     const [formData, setFormData] = useState({
         startupName: '',
@@ -31,6 +36,7 @@ const SubmitStartup = () => {
         industry_id: '',
         website: '',
         logo: null,
+        banner: null,
         description: '',
         stage: '',
         location: '',
@@ -48,7 +54,6 @@ const SubmitStartup = () => {
             .catch(() => setCategories([]));
     }, []);
 
-    // If edit mode: fetch the current startup and pre-fill everything
     useEffect(() => {
         if (!editMode || !token) return;
         getMyStartup(token).then(s => {
@@ -64,12 +69,12 @@ const SubmitStartup = () => {
                 location: s.location || '',
                 teamSize: s.team_size ? String(s.team_size) : '',
                 foundedYear: s.founded_year ? String(s.founded_year) : '',
-                termsAccepted: true, // pre-accept in edit mode
-                logo: null, // file can't be pre-filled; show existing preview separately
+                termsAccepted: true,
+                logo: null,
                 incorporationCert: null,
                 existingLogoUrl: s.logo_url || null,
+                existingBannerUrl: s.banner_url || null,
             }));
-            // Pre-fill founders
             if (Array.isArray(s.founders) && s.founders.length > 0) {
                 setFounders(s.founders.map(f => ({
                     id: f.id,
@@ -134,7 +139,6 @@ const SubmitStartup = () => {
 
         try {
             if (editMode && startupId) {
-                // ── UPDATE MODE ──────────────────────────────────────────────
                 await updateStartup(token, startupId, {
                     name: formData.startupName,
                     tagline: formData.tagline,
@@ -145,12 +149,10 @@ const SubmitStartup = () => {
                     location: formData.location,
                     team_size: formData.teamSize,
                     founded_year: formData.foundedYear,
-                }, formData.logo, formData.incorporationCert);
+                }, formData.logo, formData.incorporationCert, formData.banner);
 
-                // Upsert founders: update existing, add new
                 for (const f of founders.filter(f => f.name.trim())) {
                     if (f.id) {
-                        // existing founder — update via PUT
                         const fd = new FormData();
                         fd.append('name', f.name);
                         if (f.role) fd.append('role', f.role);
@@ -162,7 +164,6 @@ const SubmitStartup = () => {
                             body: fd,
                         });
                     } else {
-                        // new founder — add via POST
                         await addFounder({
                             startup_id: startupId,
                             name: f.name,
@@ -172,9 +173,9 @@ const SubmitStartup = () => {
                     }
                 }
             } else {
-                // ── CREATE MODE ──────────────────────────────────────────────
                 const fd = new FormData();
                 if (formData.logo) fd.append('logo', formData.logo);
+                if (formData.banner) fd.append('banner', formData.banner);
                 if (formData.incorporationCert) fd.append('incorporation_certificate', formData.incorporationCert);
                 fd.append('name', formData.startupName);
                 fd.append('tagline', formData.tagline);
@@ -284,7 +285,6 @@ const SubmitStartup = () => {
                 <Col md={12}>
                     <Form.Group>
                         <Form.Label className="form-label">Startup Logo</Form.Label>
-                        {/* Show existing logo in edit mode */}
                         {editMode && formData.existingLogoUrl && !formData.logo && (
                             <div className="mb-2 d-flex align-items-center gap-2">
                                 <img src={formData.existingLogoUrl} alt="current logo" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
@@ -303,6 +303,105 @@ const SubmitStartup = () => {
                         />
                     </Form.Group>
                 </Col>
+
+                <Col md={12}>
+                    <Form.Group>
+                        <Form.Label className="form-label">Startup Banner</Form.Label>
+                        <p className="text-muted small mb-2">
+                            Full-width hero banner displayed on your startup page.
+                            You can <strong>drag &amp; zoom</strong> to crop after selecting.
+                            Any image works — we'll crop it to 4:1.
+                        </p>
+
+                        {editMode && formData.existingBannerUrl && !formData.banner && (
+                            <div className="mb-2" style={{
+                                borderRadius: 10, overflow: 'hidden',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                position: 'relative',
+                            }}>
+                                <img
+                                    src={formData.existingBannerUrl}
+                                    alt="current banner"
+                                    style={{ width: '100%', aspectRatio: '4/1', objectFit: 'cover', display: 'block' }}
+                                />
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: 'rgba(0,0,0,0.45)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', background: 'rgba(0,0,0,0.6)', padding: '4px 12px', borderRadius: 6 }}>
+                                        Current banner — upload to replace
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {bannerPreviewUrl && (
+                            <div className="mb-2" style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(14,165,233,0.4)' }}>
+                                <img
+                                    src={bannerPreviewUrl}
+                                    alt="banner preview"
+                                    style={{ width: '100%', aspectRatio: '4/1', objectFit: 'cover', display: 'block' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCropper(true)}
+                                    style={{
+                                        position: 'absolute', bottom: 8, right: 8,
+                                        background: 'rgba(0,0,0,0.7)',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        borderRadius: 8, color: '#fff',
+                                        padding: '4px 12px', fontSize: '0.75rem',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
+                                        backdropFilter: 'blur(4px)',
+                                    }}
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 2v4h12V2" /><rect x="6" y="10" width="12" height="12" /><path d="M2 6h4v12H2" /></svg>
+                                    Re-crop
+                                </button>
+                            </div>
+                        )}
+
+                        <div
+                            className="file-upload-box"
+                            style={{ cursor: 'pointer', aspectRatio: 'unset', minHeight: 72 }}
+                            onClick={() => bannerInputRef.current?.click()}
+                        >
+                            <div className="upload-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="18" height="14" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                                </svg>
+                            </div>
+                            <input
+                                ref={bannerInputRef}
+                                type="file"
+                                id="banner-upload"
+                                name="banner"
+                                className="d-none"
+                                accept="image/png,image/jpeg,image/webp,image/jpg"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    if (file.size > 10 * 1024 * 1024) {
+                                        alert('Please select an image under 10MB.');
+                                        e.target.value = '';
+                                        return;
+                                    }
+                                    const url = URL.createObjectURL(file);
+                                    setBannerRawSrc(url);
+                                    setShowCropper(true);
+                                    e.target.value = '';
+                                }}
+                            />
+                            <p className="upload-text mb-0">
+                                {formData.banner
+                                    ? <span className="text-success fw-semibold">✓ Banner ready — click to change</span>
+                                    : <><span className="text-primary" style={{ cursor: 'pointer' }}>Browse</span> or drag &amp; drop</>}
+                            </p>
+                            <small className="text-muted d-block mt-1">Any image · Crop tool opens after selection · JPG/PNG/WebP up to 10MB</small>
+                        </div>
+                    </Form.Group>
+                </Col>
             </Row>
 
             <div className="d-flex justify-content-end mt-4">
@@ -315,6 +414,19 @@ const SubmitStartup = () => {
             </div>
         </div>
     );
+
+    const handleCropDone = (croppedFile) => {
+        setShowCropper(false);
+        if (bannerPreviewUrl) URL.revokeObjectURL(bannerPreviewUrl);
+        const previewUrl = URL.createObjectURL(croppedFile);
+        setBannerPreviewUrl(previewUrl);
+        setFormData(prev => ({ ...prev, banner: croppedFile }));
+    };
+
+    const handleCropCancel = () => {
+        setShowCropper(false);
+        if (!formData.banner) setBannerRawSrc(null);
+    };
 
     const StepProduct = () => (
         <div className="startup-form-card">
@@ -393,7 +505,6 @@ const SubmitStartup = () => {
                         <Col md={12}>
                             <Form.Group>
                                 <Form.Label className="form-label">Founder Photo</Form.Label>
-                                {/* Show existing photo in edit mode */}
                                 {editMode && founder.existingPhotoUrl && !founder.photo && (
                                     <div className="mb-2 d-flex align-items-center gap-2">
                                         <img src={founder.existingPhotoUrl} alt={founder.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
@@ -586,60 +697,71 @@ const SubmitStartup = () => {
     );
 
     return (
-        <div className="submit-startup-page">
-            <Container>
-                {currentStep < 4 && (
-                    <div className="text-center mb-5">
-                        <h6 className="text-primary text-uppercase mb-2 small">
-                            {editMode ? 'Edit Your Startup' : 'Submit Your Startup'}
-                        </h6>
-                        <h1 className="display-6 fw-bold mb-3">
-                            {editMode ? 'Update Your Startup Details' : 'Get Featured on WeLink'}
-                        </h1>
-                        <p className="text-muted">
-                            {editMode
-                                ? 'Changes will go to PENDING for admin approval. Your existing posts stay visible.'
-                                : 'Submissions are reviewed by our editorial team before publishing.'}
-                        </p>
-                    </div>
-                )}
+        <>
+            {showCropper && bannerRawSrc && (
+                <BannerCropper
+                    imageSrc={bannerRawSrc}
+                    onCropDone={handleCropDone}
+                    onCancel={handleCropCancel}
+                />
+            )}
 
-                {currentStep < 4 && (
-                    <div className="steps-indicator">
-                        <div className="steps-progress-line">
-                            <div className="steps-progress-fill" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
+            <div className="submit-startup-page">
+                <Container>
+                    {currentStep < 4 && (
+                        <div className="text-center mb-5">
+                            <h6 className="text-primary text-uppercase mb-2 small">
+                                {editMode ? 'Edit Your Startup' : 'Submit Your Startup'}
+                            </h6>
+                            <h1 className="display-6 fw-bold mb-3">
+                                {editMode ? 'Update Your Startup Details' : 'Get Featured on WeLink'}
+                            </h1>
+                            <p className="text-muted">
+                                {editMode
+                                    ? 'Changes will go to PENDING for admin approval. Your existing posts stay visible.'
+                                    : 'Submissions are reviewed by our editorial team before publishing.'}
+                            </p>
                         </div>
+                    )}
 
-                        {[
-                            { label: 'Basics', num: 1 },
-                            { label: 'Product & Founders', num: 2 },
-                            { label: 'Company & Submit', num: 3 },
-                        ].map(({ label, num }) => (
-                            <div key={num} className={`step-item ${currentStep >= num ? 'active' : ''} ${currentStep > num ? 'completed' : ''}`}>
-                                <div className="step-circle">
-                                    {currentStep > num ? (
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="20 6 9 17 4 12" />
-                                        </svg>
-                                    ) : (
-                                        <span>{num}</span>
-                                    )}
-                                </div>
-                                <span className="step-label">{label}</span>
+                    {currentStep < 4 && (
+                        <div className="steps-indicator">
+                            <div className="steps-progress-line">
+                                <div className="steps-progress-fill" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
                             </div>
-                        ))}
-                    </div>
-                )}
 
-                <div className="form-container">
-                    {currentStep === 1 && StepBasics()}
-                    {currentStep === 2 && StepProduct()}
-                    {currentStep === 3 && StepSubmit()}
-                    {currentStep === 4 && StepSuccess()}
-                </div>
-            </Container>
-        </div>
+                            {[
+                                { label: 'Basics', num: 1 },
+                                { label: 'Product & Founders', num: 2 },
+                                { label: 'Company & Submit', num: 3 },
+                            ].map(({ label, num }) => (
+                                <div key={num} className={`step-item ${currentStep >= num ? 'active' : ''} ${currentStep > num ? 'completed' : ''}`}>
+                                    <div className="step-circle">
+                                        {currentStep > num ? (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        ) : (
+                                            <span>{num}</span>
+                                        )}
+                                    </div>
+                                    <span className="step-label">{label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="form-container">
+                        {currentStep === 1 && StepBasics()}
+                        {currentStep === 2 && StepProduct()}
+                        {currentStep === 3 && StepSubmit()}
+                        {currentStep === 4 && StepSuccess()}
+                    </div>
+                </Container>
+            </div>
+        </>
     );
 };
 
 export default SubmitStartup;
+

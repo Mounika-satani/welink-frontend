@@ -102,13 +102,14 @@ export const getTrendingStartups = async (limit = 8) => {
     return res.json();
 };
 
-export const updateStartup = async (token, startupId, data, logoFile = null, certFile = null) => {
+export const updateStartup = async (token, startupId, data, logoFile = null, certFile = null, bannerFile = null) => {
     const fd = new FormData();
     Object.entries(data).forEach(([k, v]) => {
         if (v !== null && v !== undefined && v !== '') fd.append(k, v);
     });
     if (logoFile) fd.append('logo', logoFile);
     if (certFile) fd.append('incorporation_certificate', certFile);
+    if (bannerFile) fd.append('banner', bannerFile);
 
     const res = await fetch(`${API_URL}/startups/${startupId}`, {
         method: 'PUT',
@@ -121,6 +122,7 @@ export const updateStartup = async (token, startupId, data, logoFile = null, cer
     }
     return res.json();
 };
+
 
 export const deleteStartup = async (token, startupId) => {
     const res = await fetch(`${API_URL}/startups/${startupId}`, {
