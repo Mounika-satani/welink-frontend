@@ -1,23 +1,64 @@
 .banner-section {
+    position: relative;
+    min-height: 70vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 80px 20px;
-    background-color: var(--bg-main);
-    background: radial-gradient(circle at center, rgba(29, 168, 250, 0.1) 0%, var(--bg-main) 70%);
-    min-height: 70vh;
-    position: relative;
     overflow: hidden;
+    background-color: var(--bg-main);
+    padding: 100px 20px;
+}
+
+.banner-background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.banner-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 2s ease-in-out, transform 8s linear;
+    transform: scale(1.1);
+}
+
+.banner-slide.active {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 2;
+}
+
+.default-background {
+    background: radial-gradient(circle at center, rgba(29, 168, 250, 0.1) 0%, var(--bg-main) 70%);
+}
+
+.banner-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .banner-title {
-    font-size: 4rem;
-    font-weight: 700;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 800;
     color: var(--color-white);
-    line-height: 1.2;
-    margin-bottom: 20px;
+    line-height: 1.1;
+    margin-bottom: 30px;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    animation: fadeInUp 1s ease-out;
 }
 
 .banner-title .highlight {
@@ -25,7 +66,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
+    display: inline-block;
 }
 
 /* Bottom decorative line */
@@ -35,13 +76,26 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, transparent 0%, #1DA8FA 50%, transparent 100%);
-    box-shadow: 0 0 10px #1DA8FA;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(29, 168, 250, 0.4) 50%, transparent 100%);
+    z-index: 15;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
-    .banner-title {
-        font-size: 2.5rem;
+    .banner-section {
+        min-height: 50vh;
+        padding: 60px 20px;
     }
 }

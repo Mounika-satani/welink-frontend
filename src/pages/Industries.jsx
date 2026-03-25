@@ -17,7 +17,7 @@ const Industries = () => {
             try {
                 setLoading(true);
                 const data = await getAllCategories();
-                setCategories(data);
+                setCategories(data.filter(c => c.type === 'INDUSTRY' || !c.type));
                 setError(null);
             } catch (err) {
                 console.error('Error fetching categories:', err);

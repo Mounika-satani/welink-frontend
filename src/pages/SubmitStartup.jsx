@@ -9,6 +9,7 @@ import './SubmitStartup.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
+const ROLE_OPTIONS = ['CEO', 'CTO', 'Founder', 'Co-Founder', 'CMO', 'CFO', 'COO', 'Product', 'Engineering'];
 
 const emptyFounder = () => ({ name: '', role: '', linkedIn: '', photo: null });
 
@@ -20,10 +21,55 @@ const SubmitStartup = () => {
     const editMode = location.state?.editMode === true;
 
     const [currentStep, setCurrentStep] = useState(1);
+    const [industrySearch, setIndustrySearch] = useState('');
     const [categories, setCategories] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [startupId, setStartupId] = useState(null);
+    const [errors, setErrors] = useState({});
+
+    const clearError = (field) => setErrors(prev => { const e = { ...prev }; delete e[field]; return e; });
+
+    const validateStep = (step) => {
+        const e = {};
+        if (step === 1) {
+            if (!formData.startupName.trim()) e.startupName = 'Startup name is required.';
+            if (!formData.tagline.trim()) e.tagline = 'Tagline is required.';
+            if (formData.industry_ids.length === 0) e.industry_ids = 'Please select at least one industry.';
+            if (!formData.logo && !formData.existingLogoUrl) e.logo = 'Please upload a startup logo.';
+        }
+        if (step === 2) {
+            if (!formData.description.trim()) e.description = 'Product description is required.';
+            // Validate all founders
+            const firstFounder = founders[0];
+            if (!firstFounder || !firstFounder.name.trim()) {
+                e.founderName = 'Primary founder name is required.';
+            } else if (!firstFounder.role.trim()) {
+                e.founderRole = 'Primary founder role is required.';
+            }
+
+            // Check if any other added founders are missing info
+            founders.slice(1).forEach((f, idx) => {
+                if (f.name.trim() && !f.role.trim()) {
+                    e[`founderRole_${idx + 1}`] = `Role is required for ${f.name}.`;
+                } else if (!f.name.trim() && f.role.trim()) {
+                    e[`founderName_${idx + 1}`] = `Name is required for role ${f.role}.`;
+                }
+            });
+        }
+        if (step === 3) {
+            if (!formData.stage) e.stage = 'Please select a funding stage.';
+            if (!formData.incorporationCert && !formData.existingCertUrl) {
+                e.incorporationCert = 'Incorporation certificate is mandatory.';
+            }
+            if (!editMode && !formData.termsAccepted) {
+                setSubmitError('Please accept the terms to submit.');
+                return false;
+            }
+        }
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
 
     const [bannerRawSrc, setBannerRawSrc] = useState(null);
     const [showCropper, setShowCropper] = useState(false);
@@ -33,7 +79,7 @@ const SubmitStartup = () => {
     const [formData, setFormData] = useState({
         startupName: '',
         tagline: '',
-        industry_id: '',
+        industry_ids: [],
         website: '',
         logo: null,
         banner: null,
@@ -44,15 +90,45 @@ const SubmitStartup = () => {
         foundedYear: '',
         incorporationCert: null,
         termsAccepted: false,
+        linkedin_url: '',
+        twitter_url: '',
+        instagram_url: '',
+        facebook_url: '',
     });
 
     const [founders, setFounders] = useState([emptyFounder()]);
 
+    const [existingStartup, setExistingStartup] = useState(null);
+    const [checkingExisting, setCheckingExisting] = useState(true);
+
     useEffect(() => {
         getCategories()
-            .then(setCategories)
+            .then(data => {
+                const industryOnly = data.filter(c => c.type === 'INDUSTRY' || !c.type);
+                setCategories(industryOnly);
+            })
             .catch(() => setCategories([]));
     }, []);
+
+    useEffect(() => {
+        if (!token) {
+            setCheckingExisting(false);
+            return;
+        }
+
+        // Check for existing startup to prevent duplicate submissions
+        getMyStartup(token)
+            .then(s => {
+                if (s && s.id) {
+                    setExistingStartup(s);
+                    // If we are in edit mode, the subsequent useEffect handles data loading
+                }
+            })
+            .catch(() => {
+                // 404 means no startup yet, which is fine
+            })
+            .finally(() => setCheckingExisting(false));
+    }, [token]);
 
     useEffect(() => {
         if (!editMode || !token) return;
@@ -62,7 +138,7 @@ const SubmitStartup = () => {
                 ...prev,
                 startupName: s.name || '',
                 tagline: s.tagline || '',
-                industry_id: s.industry_id || '',
+                industry_ids: s.industries ? s.industries.map(i => i.id) : (s.industry_id ? [s.industry_id] : []),
                 website: s.website_url || '',
                 description: s.description || '',
                 stage: s.funding_stage || '',
@@ -74,6 +150,11 @@ const SubmitStartup = () => {
                 incorporationCert: null,
                 existingLogoUrl: s.logo_url || null,
                 existingBannerUrl: s.banner_url || null,
+                existingCertUrl: s.incorporation_certificate_url || null,
+                linkedin_url: s.linkedin_url || '',
+                twitter_url: s.twitter_url || '',
+                instagram_url: s.instagram_url || '',
+                facebook_url: s.facebook_url || '',
             }));
             if (Array.isArray(s.founders) && s.founders.length > 0) {
                 setFounders(s.founders.map(f => ({
@@ -94,6 +175,7 @@ const SubmitStartup = () => {
             ...prev,
             [name]: type === 'checkbox' ? checked : (type === 'file' ? files[0] : value),
         }));
+        clearError(name);
     };
 
     const handleFounderChange = (index, e) => {
@@ -108,12 +190,31 @@ const SubmitStartup = () => {
         });
     };
 
+    const toggleFounderRole = (index, role) => {
+        setFounders(prev => {
+            const updated = [...prev];
+            const currentRoles = updated[index].role ? updated[index].role.split(', ') : [];
+            let newRoles;
+            if (currentRoles.includes(role)) {
+                newRoles = currentRoles.filter(r => r !== role);
+            } else {
+                newRoles = [...currentRoles, role];
+            }
+            updated[index] = {
+                ...updated[index],
+                role: newRoles.join(', '),
+            };
+            return updated;
+        });
+    };
+
     const addAnotherFounder = () => setFounders(prev => [...prev, emptyFounder()]);
 
     const removeFounder = (index) =>
         setFounders(prev => prev.filter((_, i) => i !== index));
 
     const handleNext = () => {
+        if (!validateStep(currentStep)) return;
         if (currentStep < 3) {
             setCurrentStep(currentStep + 1);
             window.scrollTo(0, 0);
@@ -130,10 +231,8 @@ const SubmitStartup = () => {
     };
 
     const handleSubmit = async () => {
-        if (!editMode && !formData.termsAccepted) {
-            setSubmitError('Please accept the terms to continue.');
-            return;
-        }
+        if (!validateStep(currentStep)) return;
+
         setSubmitting(true);
         setSubmitError('');
 
@@ -143,12 +242,16 @@ const SubmitStartup = () => {
                     name: formData.startupName,
                     tagline: formData.tagline,
                     description: formData.description,
-                    industry_id: formData.industry_id,
+                    industry_id: formData.industry_ids[0] || '',
                     website_url: formData.website,
                     funding_stage: formData.stage,
                     location: formData.location,
                     team_size: formData.teamSize,
                     founded_year: formData.foundedYear,
+                    linkedin_url: formData.linkedin_url,
+                    twitter_url: formData.twitter_url,
+                    instagram_url: formData.instagram_url,
+                    facebook_url: formData.facebook_url,
                 }, formData.logo, formData.incorporationCert, formData.banner);
 
                 for (const f of founders.filter(f => f.name.trim())) {
@@ -174,18 +277,32 @@ const SubmitStartup = () => {
                 }
             } else {
                 const fd = new FormData();
-                if (formData.logo) fd.append('logo', formData.logo);
-                if (formData.banner) fd.append('banner', formData.banner);
-                if (formData.incorporationCert) fd.append('incorporation_certificate', formData.incorporationCert);
+                // Append text fields first for better multer parsing
                 fd.append('name', formData.startupName);
                 fd.append('tagline', formData.tagline);
                 fd.append('description', formData.description);
-                if (formData.industry_id) fd.append('industry_id', formData.industry_id);
+                // Append all selected industry IDs
+                formData.industry_ids.forEach(id => fd.append('industry_ids', id));
+                // Set primary industry_id for legacy support
+                if (formData.industry_ids.length > 0) {
+                    fd.append('industry_id', formData.industry_ids[0]);
+                }
                 if (formData.website) fd.append('website_url', formData.website);
                 if (formData.stage) fd.append('funding_stage', formData.stage);
                 if (formData.location) fd.append('location', formData.location);
                 if (formData.teamSize) fd.append('team_size', formData.teamSize);
                 if (formData.foundedYear) fd.append('founded_year', formData.foundedYear);
+
+                // Social links
+                fd.append('linkedin_url', formData.linkedin_url || '');
+                fd.append('twitter_url', formData.twitter_url || '');
+                fd.append('instagram_url', formData.instagram_url || '');
+                fd.append('facebook_url', formData.facebook_url || '');
+
+                // Append files last
+                if (formData.logo) fd.append('logo', formData.logo);
+                if (formData.banner) fd.append('banner', formData.banner);
+                if (formData.incorporationCert) fd.append('incorporation_certificate', formData.incorporationCert);
 
                 const res = await fetch(`${API_URL}/startups/create`, {
                     method: 'POST',
@@ -227,7 +344,7 @@ const SubmitStartup = () => {
                     ? <span className="text-success fw-semibold">✓ {file.name}</span>
                     : <><span className="text-primary" style={{ cursor: 'pointer' }}>Browse</span> or drag &amp; drop</>}
             </p>
-            {hint && <small className="text-muted d-block mt-1">{hint}</small>}
+            {hint && <small className="d-block mt-1">{hint}</small>}
         </div>
     );
 
@@ -241,36 +358,92 @@ const SubmitStartup = () => {
                     <Form.Group>
                         <Form.Label className="form-label">Startup Name *</Form.Label>
                         <Form.Control type="text" name="startupName" placeholder="e.g. NeuralFlow"
-                            className="form-control-dark" value={formData.startupName} onChange={handleInputChange} />
+                            className={`form-control-dark ${errors.startupName ? 'field-error' : ''}`}
+                            value={formData.startupName} onChange={handleInputChange} />
+                        {errors.startupName && <p className="field-error-msg">{errors.startupName}</p>}
                     </Form.Group>
                 </Col>
                 <Col md={6}>
                     <Form.Group>
                         <Form.Label className="form-label">Tagline *</Form.Label>
                         <Form.Control type="text" name="tagline" placeholder="e.g. AI for Supply Chain"
-                            className="form-control-dark" value={formData.tagline} onChange={handleInputChange} />
+                            className={`form-control-dark ${errors.tagline ? 'field-error' : ''}`}
+                            value={formData.tagline} onChange={handleInputChange} />
+                        {errors.tagline && <p className="field-error-msg">{errors.tagline}</p>}
                     </Form.Group>
                 </Col>
 
                 <Col md={12}>
                     <Form.Group>
                         <Form.Label className="form-label">Industry *</Form.Label>
+
+                        {/* Search bar */}
+                        <div className="industry-search-wrapper">
+                            <svg className="industry-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                type="text"
+                                className="industry-search-input"
+                                placeholder="Search industries..."
+                                value={industrySearch}
+                                onChange={e => setIndustrySearch(e.target.value)}
+                            />
+                            {industrySearch && (
+                                <button type="button" className="industry-search-clear" onClick={() => setIndustrySearch('')}>✕</button>
+                            )}
+                        </div>
+
+
+                        {/* Selected pills */}
+                        {formData.industry_ids.length > 0 && (
+                            <div className="industry-selected-pills">
+                                {formData.industry_ids.map(id => {
+                                    const cat = categories.find(c => c.id === id);
+                                    return cat ? (
+                                        <span key={id} className="industry-pill">
+                                            {cat.name}
+                                            <button type="button" className="industry-pill-remove"
+                                                onClick={() => setFormData(prev => ({
+                                                    ...prev,
+                                                    industry_ids: prev.industry_ids.filter(i => i !== id),
+                                                }))}>✕</button>
+                                        </span>
+                                    ) : null;
+                                })}
+                            </div>
+                        )}
+
+                        {/* Filtered full list */}
                         {categories.length > 0 ? (
-                            <div className="tags-container">
-                                {categories.map(cat => (
-                                    <button key={cat.id} type="button"
-                                        className={`tag-btn ${formData.industry_id === cat.id ? 'active' : ''}`}
-                                        onClick={() => setFormData({ ...formData, industry_id: cat.id })}>
-                                        {cat.name}
-                                    </button>
-                                ))}
+                            <div className="industry-tag-grid">
+                                {categories
+                                    .filter(cat => cat.name.toLowerCase().includes(industrySearch.toLowerCase()))
+                                    .map(cat => {
+                                        const selected = formData.industry_ids.includes(cat.id);
+                                        return (
+                                            <button key={cat.id} type="button"
+                                                className={`tag-btn ${selected ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        industry_ids: selected
+                                                            ? prev.industry_ids.filter(id => id !== cat.id)
+                                                            : [...prev.industry_ids, cat.id],
+                                                    }));
+                                                }}>
+                                                {cat.name}
+                                            </button>
+                                        );
+                                    })}
+                                {categories.filter(c => c.name.toLowerCase().includes(industrySearch.toLowerCase())).length === 0 && (
+                                    <p className="text-muted small mt-2 mb-0">No industries match "{industrySearch}"</p>
+                                )}
                             </div>
                         ) : (
-                            <Form.Select name="industry_id" className="form-control-dark"
-                                value={formData.industry_id} onChange={handleInputChange}>
-                                <option value="">Loading categories...</option>
-                            </Form.Select>
+                            <p className="text-muted small mt-2">Loading categories...</p>
                         )}
+                        {errors.industry_ids && <p className="field-error-msg mt-2">{errors.industry_ids}</p>}
                     </Form.Group>
                 </Col>
 
@@ -283,8 +456,52 @@ const SubmitStartup = () => {
                 </Col>
 
                 <Col md={12}>
+                    <div className="social-links-grid mt-2">
+                        <h6 className="text-white mb-3 small opacity-75">SOCIAL PROFILES (OPTIONAL)</h6>
+                        <Row className="g-3">
+                            <Col md={6}>
+                                <div className="social-input-wrapper">
+                                    <div className="social-icon-box linkedin">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
+                                    </div>
+                                    <input type="url" name="linkedin_url" placeholder="LinkedIn URL"
+                                        className="form-control-dark social-input" value={formData.linkedin_url} onChange={handleInputChange} />
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <div className="social-input-wrapper">
+                                    <div className="social-icon-box twitter">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
+                                    </div>
+                                    <input type="url" name="twitter_url" placeholder="Twitter URL"
+                                        className="form-control-dark social-input" value={formData.twitter_url} onChange={handleInputChange} />
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <div className="social-input-wrapper">
+                                    <div className="social-icon-box instagram">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                                    </div>
+                                    <input type="url" name="instagram_url" placeholder="Instagram URL"
+                                        className="form-control-dark social-input" value={formData.instagram_url} onChange={handleInputChange} />
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <div className="social-input-wrapper">
+                                    <div className="social-icon-box facebook">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" /></svg>
+                                    </div>
+                                    <input type="url" name="facebook_url" placeholder="Facebook URL"
+                                        className="form-control-dark social-input" value={formData.facebook_url} onChange={handleInputChange} />
+                                </div>
+                            </Col>
+                        </Row>
+                    </div>
+                </Col>
+
+                <Col md={12}>
                     <Form.Group>
-                        <Form.Label className="form-label">Startup Logo</Form.Label>
+                        <Form.Label className="form-label">Startup Logo *</Form.Label>
                         {editMode && formData.existingLogoUrl && !formData.logo && (
                             <div className="mb-2 d-flex align-items-center gap-2">
                                 <img src={formData.existingLogoUrl} alt="current logo" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
@@ -293,21 +510,23 @@ const SubmitStartup = () => {
                         )}
                         <FileUploadBox
                             id="logo-upload" name="logo" accept="image/*"
-                            file={formData.logo} onChange={handleInputChange}
+                            file={formData.logo} onChange={(e) => { handleInputChange(e); clearError('logo'); }}
                             hint="PNG, JPG up to 5MB. 400×400px recommended"
                             icon={
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
                                 </svg>
                             }
+                            hasError={!!errors.logo}
                         />
+                        {errors.logo && <p className="field-error-msg">{errors.logo}</p>}
                     </Form.Group>
                 </Col>
 
                 <Col md={12}>
                     <Form.Group>
                         <Form.Label className="form-label">Startup Banner</Form.Label>
-                        <p className="text-muted small mb-2">
+                        <p className="small mb-2">
                             Full-width hero banner displayed on your startup page.
                             You can <strong>drag &amp; zoom</strong> to crop after selecting.
                             Any image works — we'll crop it to 4:1.
@@ -398,7 +617,7 @@ const SubmitStartup = () => {
                                     ? <span className="text-success fw-semibold">✓ Banner ready — click to change</span>
                                     : <><span className="text-primary" style={{ cursor: 'pointer' }}>Browse</span> or drag &amp; drop</>}
                             </p>
-                            <small className="text-muted d-block mt-1">Any image · Crop tool opens after selection · JPG/PNG/WebP up to 10MB</small>
+                            <small className="d-block mt-1">Any image · Crop tool opens after selection · JPG/PNG/WebP up to 10MB</small>
                         </div>
                     </Form.Group>
                 </Col>
@@ -439,14 +658,15 @@ const SubmitStartup = () => {
                         <Form.Label className="form-label">Product Description *</Form.Label>
                         <Form.Control as="textarea" name="description" rows={4}
                             placeholder="What does your product do?"
-                            className="form-control-dark textarea-dark"
+                            className={`form-control-dark textarea-dark ${errors.description ? 'field-error' : ''}`}
                             value={formData.description} onChange={handleInputChange} />
+                        {errors.description && <p className="field-error-msg">{errors.description}</p>}
                     </Form.Group>
                 </Col>
 
                 <Col md={12}>
                     <h5 className="text-white mt-2 mb-1">Founder(s)</h5>
-                    <p className="text-muted small mb-3">Add at least one founder. You can add more below.</p>
+                    <p className="small mb-3">Add at least one founder. You can add more below.</p>
                 </Col>
             </Row>
 
@@ -470,26 +690,42 @@ const SubmitStartup = () => {
                                 <Form.Label className="form-label">Full Name *</Form.Label>
                                 <Form.Control type="text" name="name"
                                     placeholder="e.g. Elon Musk"
-                                    className="form-control-dark"
+                                    className={`form-control-dark ${index === 0 && errors.founderName ? 'field-error' : ''}`}
                                     value={founder.name}
-                                    onChange={(e) => handleFounderChange(index, e)} />
+                                    onChange={(e) => { handleFounderChange(index, e); if (index === 0) clearError('founderName'); }} />
+                                {index === 0 && errors.founderName && <p className="field-error-msg">{errors.founderName}</p>}
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
+                        <Col md={12}>
                             <Form.Group>
-                                <Form.Label className="form-label">Role / Title</Form.Label>
-                                <Form.Select name="role" className="form-control-dark"
-                                    value={founder.role}
-                                    onChange={(e) => handleFounderChange(index, e)}>
-                                    <option value="">Select role</option>
-                                    <option value="CEO">CEO</option>
-                                    <option value="CTO">CTO</option>
-                                    <option value="Co-Founder">Co-Founder</option>
-                                    <option value="CMO">CMO</option>
-                                    <option value="CFO">CFO</option>
-                                    <option value="COO">COO</option>
-                                    <option value="Founder">Founder</option>
-                                </Form.Select>
+                                <Form.Label className="form-label">Role(s) / Title *</Form.Label>
+                                <div className="tags-container">
+                                    {ROLE_OPTIONS.map(role => {
+                                        const selected = (founder.role || '').split(', ').includes(role);
+                                        return (
+                                            <button key={role} type="button"
+                                                className={`tag-btn small ${selected ? 'active' : ''}`}
+                                                onClick={() => toggleFounderRole(index, role)}>
+                                                {role}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <div className="mt-2">
+                                    <Form.Control
+                                        type="text"
+                                        name="role"
+                                        placeholder="Or type custom role..."
+                                        className="form-control-dark mt-2"
+                                        value={founder.role}
+                                        onChange={(e) => handleFounderChange(index, e)}
+                                        style={{ fontSize: '0.85rem' }}
+                                    />
+                                    <small className="text-muted">Separate multiple roles with commas (e.g. CEO, Founder)</small>
+                                </div>
+                                {index === 0 && errors.founderRole && <p className="field-error-msg">{errors.founderRole}</p>}
+                                {index > 0 && errors[`founderRole_${index}`] && <p className="field-error-msg">{errors[`founderRole_${index}`]}</p>}
+                                {index > 0 && errors[`founderName_${index}`] && <p className="field-error-msg">{errors[`founderName_${index}`]}</p>}
                             </Form.Group>
                         </Col>
                         <Col md={12}>
@@ -508,7 +744,7 @@ const SubmitStartup = () => {
                                 {editMode && founder.existingPhotoUrl && !founder.photo && (
                                     <div className="mb-2 d-flex align-items-center gap-2">
                                         <img src={founder.existingPhotoUrl} alt={founder.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
-                                        <small className="text-muted">Current photo — upload to replace</small>
+                                        <small className="text-white">Current photo — upload to replace</small>
                                     </div>
                                 )}
                                 <div className="file-upload-box"
@@ -527,7 +763,7 @@ const SubmitStartup = () => {
                                             ? <span className="text-success fw-semibold">✓ {founder.photo.name}</span>
                                             : <><span className="text-primary">Browse</span> or drag &amp; drop</>}
                                     </p>
-                                    <small className="text-muted d-block mt-1">PNG, JPG up to 5MB</small>
+                                    <small className="d-block mt-1">PNG, JPG up to 5MB</small>
                                 </div>
                             </Form.Group>
                         </Col>
@@ -543,7 +779,12 @@ const SubmitStartup = () => {
             </button>
 
             <div className="d-flex justify-content-between mt-4">
-                <button className="btn-back" onClick={handleBack}>← Previous</button>
+                <button className="btn-back" onClick={handleBack}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+                    </svg>
+                    Previous
+                </button>
                 <button className="btn-primary-custom" onClick={handleNext}>
                     Continue
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -563,15 +804,16 @@ const SubmitStartup = () => {
                 <Col md={12}>
                     <Form.Group>
                         <Form.Label className="form-label">Funding Stage *</Form.Label>
-                        <div className="tags-container">
+                        <div className={`tags-container ${errors.stage ? 'tags-error' : ''}`}>
                             {['Pre-seed', 'Seed', 'Series A', 'Series B', 'Bootstrap'].map(stage => (
                                 <button key={stage} type="button"
                                     className={`tag-btn ${formData.stage === stage ? 'active' : ''}`}
-                                    onClick={() => setFormData({ ...formData, stage })}>
+                                    onClick={() => { setFormData({ ...formData, stage }); clearError('stage'); }}>
                                     {stage}
                                 </button>
                             ))}
                         </div>
+                        {errors.stage && <p className="field-error-msg">{errors.stage}</p>}
                     </Form.Group>
                 </Col>
 
@@ -614,8 +856,16 @@ const SubmitStartup = () => {
 
                 <Col md={12}>
                     <Form.Group>
-                        <Form.Label className="form-label">Incorporation Certificate</Form.Label>
-                        <p className="text-muted small mb-2">Optional — upload a PDF or image of your incorporation document.</p>
+                        <Form.Label className="form-label">Incorporation Certificate *</Form.Label>
+                        <p className="small mb-2">Upload a PDF or image of your incorporation document.</p>
+                        {editMode && formData.existingCertUrl && !formData.incorporationCert && (
+                            <div className="mb-2 d-flex align-items-center gap-2">
+                                <a href={formData.existingCertUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-info py-1 px-2" style={{ fontSize: '0.75rem' }}>
+                                    View Current Certificate
+                                </a>
+                                <small className="text-muted">Upload a new file to replace</small>
+                            </div>
+                        )}
                         <FileUploadBox
                             id="cert-upload"
                             name="incorporationCert"
@@ -630,7 +880,9 @@ const SubmitStartup = () => {
                                     <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
                                 </svg>
                             }
+                            hasError={!!errors.incorporationCert}
                         />
+                        {errors.incorporationCert && <p className="field-error-msg">{errors.incorporationCert}</p>}
                     </Form.Group>
                 </Col>
 
@@ -655,7 +907,12 @@ const SubmitStartup = () => {
             </Row>
 
             <div className="d-flex justify-content-between mt-5">
-                <button className="btn-back" onClick={handleBack} disabled={submitting}>← Previous</button>
+                <button className="btn-back" onClick={handleBack} disabled={submitting}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+                    </svg>
+                    Previous
+                </button>
                 <button className="btn-primary-custom" onClick={handleSubmit} disabled={submitting}>
                     {submitting ? (editMode ? 'Saving...' : 'Submitting...') : (editMode ? 'Save Changes' : 'Submit for Review')}
                 </button>
@@ -695,6 +952,49 @@ const SubmitStartup = () => {
             )}
         </div>
     );
+
+    if (checkingExisting) {
+        return (
+            <div className="submit-startup-page d-flex align-items-center justify-content-center" style={{ minHeight: '80vh' }}>
+                <div className="text-center">
+                    <div className="spinner-border text-primary" role="status"></div>
+                    <p className="mt-3 text-muted">Checking submission status...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!editMode && existingStartup) {
+        const isPending = existingStartup.status === 'PENDING';
+        return (
+            <div className="submit-startup-page py-5">
+                <Container>
+                    <div className="form-container">
+                        <div className="startup-form-card text-center py-5">
+                            <div className="mb-4 d-inline-block p-4 rounded-circle bg-primary bg-opacity-10">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                                </svg>
+                            </div>
+                            <h2 className="section-title mb-3">
+                                {isPending ? 'Startup Submission Under Review' : 'Startup Already Active'}
+                            </h2>
+                            <p className="text-white mx-auto mb-4" style={{ maxWidth: '450px' }}>
+                                Your startup <strong>{existingStartup.name}</strong> is already {isPending ? 'submitted and waiting for approval' : 'active'}.
+                                {isPending ? ' Please wait until our team reviews it.' : ' You can update your details through the edit mode or manage it from your dashboard.'}
+                            </p>
+                            <div className="d-flex justify-content-center gap-3">
+                                <Link to="/" className="btn-back text-decoration-none px-4">Back to Home</Link>
+                                {!isPending && (
+                                    <button onClick={() => navigate('/submit-startup', { state: { editMode: true } })} className="btn-primary-custom px-4 py-2">Edit Startup</button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </Container>
+            </div>
+        );
+    }
 
     return (
         <>

@@ -33,6 +33,18 @@ const EyeIcon = () => (
 const ThumbsUpIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
 );
+const LinkedInIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
+);
+const TwitterIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.444 4.834c.801-.133 1.49-.43 2.056-.891-.426.056-.813.111-1.161.166.452-.278.841-.647 1.151-1.112-.423.251-.884.444-1.385.579-.395-.42-.958-.682-1.581-.682-1.196 0-2.166.97-2.166 2.166 0 .169.019.335.056.493-1.801-.09-3.398-.952-4.467-2.264-.188.322-.295.698-.295 1.09 0 .751.382 1.413.961 1.801-.354-.011-.688-.109-.981-.271v.027c0 1.049.747 1.924 1.737 2.126-.182.049-.373.076-.571.076-.14 0-.275-.014-.408-.039.276.861 1.076 1.488 2.024 1.506-.742.581-1.676.927-2.691.927-.175 0-.348-.01-.52-.03 1.059.679 2.316 1.075 3.666 1.075 4.398 0 6.802-3.644 6.802-6.802 0-.104-.002-.208-.007-.31-.468.337-.872.759-1.192 1.238l-.01.016z" /></svg>
+);
+const InstagramIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+);
+const FacebookIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" /></svg>
+);
 
 const StartupDetails = () => {
     const { id } = useParams();
@@ -193,17 +205,25 @@ const StartupDetails = () => {
             <Container className="content-container">
                 <div className="profile-card d-flex flex-column flex-md-row align-items-center gap-4 p-4 mb-5 shadow-lg" style={{ background: '#0d0e15', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <div className="d-flex flex-column align-items-center gap-3 flex-shrink-0">
-                        <div className="startup-logo-large shadow-sm" style={{ width: 80, height: 80, background: '#fff', borderRadius: 16 }}>
+                        <div className="startup-logo-large shadow-sm" style={{ width: 80, height: 80, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16 }}>
                             {startup.logo_url
-                                ? <img src={startup.logo_url} alt={startup.name} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 16, padding: '8px' }} />
-                                : <span style={{ color: '#000', fontSize: '2rem' }}>{startup.name?.charAt(0).toUpperCase()}</span>
+                                ? <img src={startup.logo_url} alt={startup.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 16 }} />
+                                : <span style={{ color: '#fff', fontSize: '2rem' }}>{startup.name?.charAt(0).toUpperCase()}</span>
                             }
                         </div>
-                        <div className="d-flex flex-column align-items-center gap-2">
-                            {startup.industry && (
-                                <span className="details-badge" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    {startup.industry.name}
-                                </span>
+                        <div className="d-flex flex-row flex-wrap justify-content-center gap-2 mt-2">
+                            {startup.industries && startup.industries.length > 0 ? (
+                                startup.industries.map((ind, idx) => (
+                                    <span key={idx} className="details-badge" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        {ind.name}
+                                    </span>
+                                ))
+                            ) : (
+                                startup.industry && (
+                                    <span className="details-badge" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        {startup.industry.name}
+                                    </span>
+                                )
                             )}
                         </div>
                     </div>
@@ -246,19 +266,6 @@ const StartupDetails = () => {
 
                     </div>
 
-                    <div className="action-buttons d-flex align-items-start gap-2 flex-shrink-0 align-self-start">
-                        {startup.website_url && (
-                            <a
-                                href={startup.website_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-primary text-decoration-none small d-flex align-items-center px-2"
-                                style={{ height: 42 }}
-                            >
-                                Visit Website
-                            </a>
-                        )}
-                    </div>
                 </div>
 
                 <Row className="g-4">
@@ -346,6 +353,80 @@ const StartupDetails = () => {
                             )}
                         </div>
 
+                        {(startup.website_url || startup.linkedin_url || startup.twitter_url || startup.instagram_url || startup.facebook_url || startup.founded_year) && (
+                            <div className="info-section sidebar-card mb-4">
+                                <h3 className="section-head mb-4 text-white">Company Details</h3>
+                                <div className="d-flex flex-column gap-3">
+                                    {(startup.website_url || startup.linkedin_url || startup.twitter_url || startup.instagram_url || startup.facebook_url) && (
+                                        <div className="d-flex flex-column gap-2">
+                                            <span className="small text-muted mb-1">Company Links</span>
+                                            {startup.website_url && (
+                                                <a href={startup.website_url} target="_blank" rel="noreferrer"
+                                                    className="link-item d-flex justify-content-between align-items-center text-decoration-none p-2 mb-1"
+                                                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                                                        <span>Website</span>
+                                                    </div>
+                                                    <span className="small">↗</span>
+                                                </a>
+                                            )}
+                                            {startup.linkedin_url && (
+                                                <a href={startup.linkedin_url} target="_blank" rel="noreferrer"
+                                                    className="link-item d-flex justify-content-between align-items-center text-decoration-none p-2 mb-1"
+                                                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <LinkedInIcon />
+                                                        <span>LinkedIn</span>
+                                                    </div>
+                                                    <span className="small">↗</span>
+                                                </a>
+                                            )}
+                                            {startup.twitter_url && (
+                                                <a href={startup.twitter_url} target="_blank" rel="noreferrer"
+                                                    className="link-item d-flex justify-content-between align-items-center text-decoration-none p-2 mb-1"
+                                                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <TwitterIcon />
+                                                        <span>Twitter</span>
+                                                    </div>
+                                                    <span className="small">↗</span>
+                                                </a>
+                                            )}
+                                            {startup.instagram_url && (
+                                                <a href={startup.instagram_url} target="_blank" rel="noreferrer"
+                                                    className="link-item d-flex justify-content-between align-items-center text-decoration-none p-2 mb-1"
+                                                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <InstagramIcon />
+                                                        <span>Instagram</span>
+                                                    </div>
+                                                    <span className="small">↗</span>
+                                                </a>
+                                            )}
+                                            {startup.facebook_url && (
+                                                <a href={startup.facebook_url} target="_blank" rel="noreferrer"
+                                                    className="link-item d-flex justify-content-between align-items-center text-decoration-none p-2 mb-1"
+                                                    style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <FacebookIcon />
+                                                        <span>Facebook</span>
+                                                    </div>
+                                                    <span className="small">↗</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
+                                    {startup.founded_year && (
+                                        <div className="d-flex justify-content-between align-items-center pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <span className="small text-muted">Founded Year</span>
+                                            <span className="text-white fw-semibold">{startup.founded_year}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
 
                     </Col>
                 </Row>
@@ -362,9 +443,9 @@ const StartupDetails = () => {
                 <Modal.Body className="p-0">
                     {selectedPost && (
                         <Row className="g-0" style={{ minHeight: '80vh' }}>
-                            <Col lg={7} className="bg-black d-flex align-items-center justify-content-center position-relative">
+                            <Col lg={7} className="bg-black d-flex align-items-center justify-content-center">
                                 {selectedPost.media_urls?.length > 1 ? (
-                                    <>
+                                    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <button className="carousel-arrow left" onClick={prevMedia} disabled={currentMediaIndex === 0}>
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
                                         </button>
@@ -382,7 +463,7 @@ const StartupDetails = () => {
                                         ) : (
                                             <img src={selectedPost.media_urls[currentMediaIndex]} alt={selectedPost.title} style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }} />
                                         )}
-                                    </>
+                                    </div>
                                 ) : (
                                     selectedPost.media_url ? (
                                         selectedPost.media_type === 'VIDEO' ? (

@@ -54,6 +54,17 @@ export const AuthProvider = ({ children }) => {
         setDbUser(null);
     };
 
+    useEffect(() => {
+        const handleAuthExpired = () => {
+            console.warn("Auth token expired. Logging out automatically.");
+            logout();
+            // Automatically prompt for login again
+            setShowLoginModal(true);
+        };
+        window.addEventListener('auth:expired', handleAuthExpired);
+        return () => window.removeEventListener('auth:expired', handleAuthExpired);
+    }, []);
+
     const triggerLogin = () => {
         setShowLoginModal(true);
     };

@@ -279,8 +279,18 @@
     color: rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     margin-top: 2px;
+}
+
+.li-view-count {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.li-view-count svg {
+    opacity: 0.7;
 }
 
 .li-header-right {

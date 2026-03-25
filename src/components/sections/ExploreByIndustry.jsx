@@ -17,9 +17,9 @@ const ExploreByIndustry = () => {
             try {
                 const data = await getAllCategories();
                 if (Array.isArray(data)) {
-                    // Process categories to trim names and filter out invalid ones
+                    // Filter specifically for Category instances of type 'INDUSTRY'
                     const processed = data
-                        .filter(c => c.name)
+                        .filter(c => c.name && (c.type === 'INDUSTRY' || !c.type))
                         .map(c => ({
                             ...c,
                             name: c.name.trim(),

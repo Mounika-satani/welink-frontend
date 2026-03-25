@@ -1,6 +1,7 @@
 
 import { useEffect } from 'react';
 import Banner from '../components/sections/Banner';
+import BannerTicker from '../components/sections/BannerTicker';
 import FeatureThisWeek from '../components/sections/FeatureThisWeek';
 import FeaturedStartups from '../components/sections/FeaturedStartups';
 import TrendingThisWeek from '../components/sections/TrendingThisWeek';
@@ -30,6 +31,7 @@ const Home = () => {
 
     return (
         <div className="home-page" onClickCapture={handleInteraction}>
+            <BannerTicker />
             <Banner />
             <FeatureThisWeek />
             <FeaturedStartups />

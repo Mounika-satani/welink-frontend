@@ -119,9 +119,8 @@ const ProfileDetails = () => {
             <Container>
                 <Row className="justify-content-center">
 
-                    <Col lg={4} md={5} className="mb-4">
-                        <div className="profile-card">
-
+                    <Col lg={7} md={9}>
+                        <div className="profile-card profile-card--single-column">
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -131,7 +130,6 @@ const ProfileDetails = () => {
                                 onChange={handleFileChange}
                             />
 
-                            {/* Avatar — plain, no click handler */}
                             <div className="profile-avatar-wrapper">
                                 {photoUrl ? (
                                     <img
@@ -145,7 +143,6 @@ const ProfileDetails = () => {
                                 )}
                             </div>
 
-                            {/* Upload/Remove buttons below the avatar */}
                             <div className="profile-photo-actions">
                                 <button
                                     className="profile-photo-btn"
@@ -156,13 +153,12 @@ const ProfileDetails = () => {
                                     {uploading ? (
                                         <div className="profile-upload-spinner" />
                                     ) : (
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                             <polyline points="17 8 12 3 7 8" />
                                             <line x1="12" y1="3" x2="12" y2="15" />
                                         </svg>
                                     )}
-                                    <span>{uploading ? 'Uploading…' : 'Upload'}</span>
                                 </button>
 
                                 {photoUrl && (
@@ -175,79 +171,44 @@ const ProfileDetails = () => {
                                         {deleting ? (
                                             <div className="profile-upload-spinner" />
                                         ) : (
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                                                 <line x1="18" y1="6" x2="6" y2="18" />
                                                 <line x1="6" y1="6" x2="18" y2="18" />
                                             </svg>
                                         )}
-                                        <span>{deleting ? 'Removing…' : 'Remove'}</span>
                                     </button>
                                 )}
                             </div>
 
                             {uploadMsg && <p className="profile-upload-msg">{uploadMsg}</p>}
                             <h1 className="profile-name">{displayName}</h1>
+
                             <hr className="profile-divider" />
 
-
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Provider</span>
-                                <span className="profile-info-value">
-                                    {profile?.auth_provider === 'google.com' ? '🔵 Google' : profile?.auth_provider || '—'}
-                                </span>
-                            </div>
-
-
-                        </div>
-                    </Col>
-
-                    <Col lg={7} md={7} className="mb-4">
-
-                        <div className="profile-card mb-4" style={{ textAlign: 'left' }}>
-                            <p className="profile-section-title">Account Details</p>
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Email</span>
-                                <span className="profile-info-value">{profile?.email}</span>
-                            </div>
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Role</span>
-                                <span className="profile-info-value profile-gradient-text">{profile?.role}</span>
-                            </div>
-                            <div className="profile-info-row">
-                                <span className="profile-info-label">Status</span>
-                                <span className={`profile-info-value ${profile?.is_active ? 'text-success' : 'text-danger'}`}>
-                                    {profile?.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="profile-card" style={{ textAlign: 'left' }}>
-                            <p className="profile-section-title">Startup</p>
-
-                            {profile?.startup ? (
-                                <Link to="/my-startup" className="profile-startup-card">
-                                    <div className="profile-startup-icon">🚀</div>
-                                    <div>
-                                        <div className="profile-startup-name">{profile.startup.name}</div>
-                                        <div className="profile-startup-sub">
-                                            {profile.startup.tagline || profile.startup.category || 'View details →'}
-                                        </div>
-                                    </div>
-                                </Link>
-                            ) : (
-                                <div className="profile-no-startup">
-                                    <p style={{ marginBottom: '0.8rem' }}>You haven't submitted a startup yet.</p>
-                                    <Link
-                                        to="/submit-startup"
-                                        className="profile-edit-btn"
-                                        style={{ textDecoration: 'none', display: 'inline-block' }}
-                                    >
-                                        + Submit Your Startup
-                                    </Link>
+                            <div className="profile-details-section">
+                                <p className="profile-section-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                    Account Details
+                                </p>
+                                <div className="profile-info-row">
+                                    <span className="profile-info-label">Email Address</span>
+                                    <span className="profile-info-value">{profile?.email}</span>
                                 </div>
-                            )}
+                                <div className="profile-info-row">
+                                    <span className="profile-info-label">Platform Role</span>
+                                    <span className="profile-info-value profile-gradient-text" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>{profile?.role}</span>
+                                </div>
+                                <div className="profile-info-row">
+                                    <span className="profile-info-label">Account Status</span>
+                                    <span className={`profile-info-value ${profile?.is_active ? 'text-success' : 'text-danger'}`}>
+                                        {profile?.is_active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-
                     </Col>
                 </Row>
             </Container>

@@ -36,21 +36,31 @@
 
 .create-post-modal .form-control,
 .create-post-modal .form-select {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 14px !important;
+    color: #ffffff !important;
+    padding: 12px 16px !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.create-post-modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+    opacity: 1 !important;
+}
+
+.create-post-modal .form-select option {
+    background: #1e1e1e;
     color: #ffffff;
-    padding: 12px 16px;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
 }
 
 .create-post-modal .form-control:focus,
 .create-post-modal .form-select:focus {
-    background: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
 }
 
 /* ── Upload Area ── */
@@ -90,20 +100,6 @@
     object-fit: cover;
 }
 
-.remove-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 1.2rem;
-    line-height: 24px;
-    cursor: pointer;
-}
 
 /* ── Thumb Strip ── */
 .media-thumb-strip {
@@ -115,6 +111,7 @@
 }
 
 .media-thumb {
+    position: relative;
     width: 50px;
     height: 50px;
     border-radius: 10px;
@@ -122,10 +119,33 @@
     cursor: pointer;
     border: 2px solid transparent;
     transition: border-color 0.2s;
+    flex-shrink: 0;
 }
 
 .media-thumb.active {
     border-color: #ffffff;
+}
+
+.thumb-remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.75);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 5;
+    transition: background 0.2s;
+}
+
+.thumb-remove:hover {
+    background: rgba(220, 38, 38, 0.9);
 }
 
 .media-thumb img {

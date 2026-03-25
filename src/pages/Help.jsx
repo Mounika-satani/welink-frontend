@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { API_URL } from '../service/api';
 import '../components/ContactFormModal.css';
 import './Help.css';
 
 const Help = () => {
+    const [searchParams] = useSearchParams();
+    const serviceParam = searchParams.get('service');
+
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
@@ -15,8 +19,14 @@ const Help = () => {
         phone: '',
         company_name: '',
         general_details: '',
-        service_id: '',
+        service_id: serviceParam || '',
     });
+
+    useEffect(() => {
+        if (serviceParam) {
+            setForm(prev => ({ ...prev, service_id: serviceParam }));
+        }
+    }, [serviceParam]);
 
     useEffect(() => {
         fetch(`${API_URL}/services`)

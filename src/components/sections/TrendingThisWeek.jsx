@@ -1,41 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Carousel, Row, Col, Card, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getTrendingStartups } from '../../service/startup';
+import { getTrendingPosts } from '../../service/post';
+import PostViewModal from '../PostViewModal';
+import { useAuth } from '../../context/AuthContext';
 import './TrendingThisWeek.css';
 
-
-
 const TrendingThisWeek = () => {
-    const [startups, setStartups] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const itemsPerSlide = 4;
+    const { dbUser, token } = useAuth();
+    const trackRef = useRef(null);
+    const animFrameRef = useRef(null);
+    const posRef = useRef(0);
 
     useEffect(() => {
-        getTrendingStartups(8)
-            .then(setStartups)
+        getTrendingPosts()
+            .then(setPosts)
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
 
-    const createSlidingWindow = (items, windowSize) => {
-        if (!items || items.length === 0) return [];
-        if (items.length <= windowSize) return [items];
+    const shouldScroll = posts.length > 4;
 
-        const windowedItems = [];
-        for (let i = 0; i < items.length; i++) {
-            const window = [];
-            for (let j = 0; j < windowSize; j++) {
-                window.push(items[(i + j) % items.length]);
-            }
-            windowedItems.push(window);
-        }
-        return windowedItems;
-    };
+    // Auto-scroll via RAF
+    useEffect(() => {
+        if (!shouldScroll || !trackRef.current) return;
+        const track = trackRef.current;
+        const SPEED = 1.5;
 
-    const slides = createSlidingWindow(startups, itemsPerSlide);
+        const step = () => {
+            posRef.current += SPEED;
+            const halfWidth = track.scrollWidth / 2;
+            if (posRef.current >= halfWidth) posRef.current = 0;
+            track.style.transform = `translateX(-${posRef.current}px)`;
+            animFrameRef.current = requestAnimationFrame(step);
+        };
+
+        animFrameRef.current = requestAnimationFrame(step);
+
+        const pause = () => cancelAnimationFrame(animFrameRef.current);
+        const resume = () => {
+            if (shouldScroll) animFrameRef.current = requestAnimationFrame(step);
+        };
+        track.parentElement.addEventListener('mouseenter', pause);
+        track.parentElement.addEventListener('mouseleave', resume);
+
+        return () => {
+            cancelAnimationFrame(animFrameRef.current);
+            track.parentElement?.removeEventListener('mouseenter', pause);
+            track.parentElement?.removeEventListener('mouseleave', resume);
+        };
+    }, [shouldScroll, posts]);
 
     if (loading) return (
         <section className="trending-section py-5">
@@ -46,12 +65,14 @@ const TrendingThisWeek = () => {
         </section>
     );
 
-    if (error || startups.length === 0) return null;
+    if (error || posts.length === 0) return null;
+
+    const displayPosts = shouldScroll ? [...posts, ...posts] : posts;
 
     return (
         <section className="trending-section py-5">
-            <Container className="px-5">
-                <div className="d-flex justify-content-between align-items-end mb-4">
+            <Container className="px-4">
+                <div className="d-flex justify-content-between align-items-end mb-4 px-2">
                     <div>
                         <h6 className="text-primary text-uppercase mb-2" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Hot Right Now</h6>
                         <h2 className="section-title mb-0">Trending This Week</h2>
@@ -62,58 +83,64 @@ const TrendingThisWeek = () => {
                     </Link>
                 </div>
 
-                <Carousel indicators={false} interval={5000} className="trending-carousel">
-                    {slides.map((slide, slideIndex) => (
-                        <Carousel.Item key={`trending-slide-${slideIndex}`}>
-                            <Row className="g-4">
-                                {slide.map((startup, idx) => {
+                <div className={`trending-viewport ${shouldScroll ? 'trending-scrollable' : 'trending-static'}`}>
+                    <div className="trending-track" ref={shouldScroll ? trackRef : null}>
+                        {displayPosts.map((post, idx) => {
+                            const actualIndex = posts.findIndex(p => p.id === post.id);
+                            const rank = actualIndex + 1;
 
-                                    const actualIndex = startups.findIndex(s => s.id === startup.id);
-                                    const rank = actualIndex + 1;
+                            const heroImage = post.media_urls?.[0]
+                                || post.media_url
+                                || post.startup?.logo_url
+                                || `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800`;
 
-                                    const heroImage = startup.logo_url
-                                        || startup.posts?.[0]?.media_url
-                                        || `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800`;
+                            return (
+                                <div key={`${post.id}-${idx}`} className="trending-card-wrapper" onClick={() => {
+                                    setSelectedPost(post);
+                                    setShowModal(true);
+                                }}>
+                                    <div className="text-decoration-none cursor-pointer">
+                                        <Card className="trending-card border-0 text-white">
+                                            <Card.Img
+                                                src={heroImage}
+                                                alt={post.title}
+                                                className="trending-img"
+                                                onError={e => {
+                                                    e.target.src = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800`;
+                                                }}
+                                            />
+                                            <div className="trending-overlay">
+                                                <div className="d-flex justify-content-between w-100 p-3 align-items-start">
+                                                    <div className="rank-badge">#{rank}</div>
+                                                </div>
 
-                                    return (
-                                        <Col lg={3} md={6} sm={12} key={`${startup.id}-${slideIndex}-${idx}`}>
-                                            <Link to={`/startup/${startup.id}`} className="text-decoration-none">
-                                                <Card className="trending-card border-0 text-white">
-                                                    <Card.Img
-                                                        src={heroImage}
-                                                        alt={startup.name}
-                                                        className="trending-img"
-                                                        onError={e => {
-                                                            e.target.src = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800`;
-                                                        }}
-                                                    />
-                                                    <div className="trending-overlay">
-                                                        <div className="d-flex justify-content-between w-100 p-3 align-items-start">
-                                                            <div className="rank-badge">#{rank}</div>
-                                                            <div className="d-flex flex-column gap-2 text-end">
-                                                            </div>
-                                                        </div>
+                                                <div className="trending-content p-3 mt-auto w-100">
+                                                    <div className="hot-tag mb-1">{post.startup?.name}</div>
+                                                    <Card.Title className="fw-bold mb-1 fs-6 text-truncate">{post.title || 'Update'}</Card.Title>
+                                                    <Card.Text className="small text-white-50 text-truncate">
+                                                        {post.content || '—'}
+                                                    </Card.Text>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                                                        <div className="trending-content p-3 mt-auto w-100">
-                                                            <div className="hot-tag mb-1">Hot Right Now</div>
-                                                            <Card.Title className="fw-bold mb-1 fs-6 text-truncate">{startup.name}</Card.Title>
-                                                            <Card.Text className="small text-white-50 text-truncate">
-                                                                {startup.tagline || startup.description || '—'}
-                                                            </Card.Text>
-                                                        </div>
-                                                    </div>
-                                                </Card>
-                                            </Link>
-                                        </Col>
-                                    );
-                                })}
-                            </Row>
-                        </Carousel.Item>
-                    ))}
-                </Carousel>
+                <PostViewModal
+                    show={showModal}
+                    onHide={() => setShowModal(false)}
+                    post={selectedPost}
+                    currentUser={dbUser}
+                    token={token}
+                />
             </Container>
         </section>
     );
 };
 
 export default TrendingThisWeek;
+

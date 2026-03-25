@@ -143,7 +143,7 @@ const CreatePostModal = ({ show, onHide }) => {
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3">
-                                    <Form.Label className="small">Post Title</Form.Label>
+                                    <Form.Label className="small">Post Title *</Form.Label>
                                     <Form.Control type="text" name="title" placeholder="Enter a catchy title..."
                                         value={formData.title} onChange={handleChange} required />
                                 </Form.Group>
@@ -186,8 +186,6 @@ const CreatePostModal = ({ show, onHide }) => {
                                                 {mediaPreviews.length > 1 && (
                                                     <div className="media-slide-badge">{activePreview + 1} / {mediaPreviews.length}</div>
                                                 )}
-                                                <button type="button" className="remove-btn"
-                                                    onClick={e => { e.stopPropagation(); removeMedia(activePreview); }}>×</button>
                                             </div>
                                         ) : (
                                             <>
@@ -231,7 +229,12 @@ const CreatePostModal = ({ show, onHide }) => {
                                                         type="button"
                                                         className="thumb-remove"
                                                         onClick={e => { e.stopPropagation(); removeMedia(i); }}
-                                                    >×</button>
+                                                    >
+                                                        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                                                            <line x1="1" y1="1" x2="9" y2="9" />
+                                                            <line x1="9" y1="1" x2="1" y2="9" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             ))}
                                             {mediaFiles.length < 10 && (

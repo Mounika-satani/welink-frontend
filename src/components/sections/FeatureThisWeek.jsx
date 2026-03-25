@@ -1,55 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Carousel, Row, Col, Card, Spinner } from 'react-bootstrap';
-import { getAllPosts } from '../../service/post';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, Spinner } from 'react-bootstrap';
+import { getAllStartups } from '../../service/startup';
+import { useNavigate } from 'react-router-dom';
 import './FeatureThisWeek.css';
 
 const FeatureThisWeek = () => {
-    const { token } = useAuth();
-    const [posts, setPosts] = useState([]);
+    const navigate = useNavigate();
+    const [startups, setStartups] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const itemsPerSlide = 3;
+    const trackRef = useRef(null);
+    const animFrameRef = useRef(null);
+    const posRef = useRef(0);
 
     useEffect(() => {
-        getAllPosts(token)
+        // Fetch newly added startups (limit 6)
+        getAllStartups(1, 6)
             .then(data => {
-                if (Array.isArray(data)) {
-                    const recentPosts = data
-                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                        .slice(0, 8);
-
-                    const mappedFeatures = recentPosts.map(post => ({
-                        id: post.id,
-                        title: post.startup?.name || "New Startup",
-                        category: post.startup?.category || post.title || "Innovation",
-                        image: (post.media_urls && post.media_urls[0]) || post.media_url || "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
-                        icon: (post.startup?.name && post.startup.name[0]) || "W"
+                if (data && Array.isArray(data.startups)) {
+                    // Startups are typically sorted by creation date or trending score
+                    // We just take the top 6 from the first page
+                    const mapped = data.startups.map(s => ({
+                        id: s.id,
+                        title: s.name,
+                        image: s.logo_url || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800',
                     }));
-                    setPosts(mappedFeatures);
+                    setStartups(mapped);
                 }
             })
-            .catch(err => console.error("Feature Fetch Error:", err))
+            .catch(err => console.error('Feature Startups Fetch Error:', err))
             .finally(() => setLoading(false));
-    }, [token]);
+    }, []);
 
-    const createSlidingWindow = (items, windowSize) => {
-        if (items.length === 0) return [];
-        if (items.length <= windowSize) {
-            return [items];
-        }
-        const windowedItems = [];
-        for (let i = 0; i < items.length; i++) {
-            const window = [];
-            for (let j = 0; j < windowSize; j++) {
-                window.push(items[(i + j) % items.length]);
+    const shouldScroll = startups.length > 3;
+
+    // Auto-scroll via RAF
+    useEffect(() => {
+        if (!shouldScroll || !trackRef.current) return;
+        const track = trackRef.current;
+        const SPEED = 1.0;
+
+        const step = () => {
+            posRef.current += SPEED;
+            const halfWidth = track.scrollWidth / 2;
+            if (posRef.current >= halfWidth) posRef.current = 0;
+            track.style.transform = `translateX(-${posRef.current}px)`;
+            animFrameRef.current = requestAnimationFrame(step);
+        };
+
+        animFrameRef.current = requestAnimationFrame(step);
+        const pause = () => cancelAnimationFrame(animFrameRef.current);
+        const resume = () => { animFrameRef.current = requestAnimationFrame(step); };
+
+        const container = track.parentElement;
+        container.addEventListener('mouseenter', pause);
+        container.addEventListener('mouseleave', resume);
+
+        return () => {
+            cancelAnimationFrame(animFrameRef.current);
+            if (container) {
+                container.removeEventListener('mouseenter', pause);
+                container.removeEventListener('mouseleave', resume);
             }
-            windowedItems.push(window);
-        }
-        return windowedItems;
-    };
-
-    const featureSlides = createSlidingWindow(posts, itemsPerSlide);
+        };
+    }, [shouldScroll, startups]);
 
     if (loading) return (
         <section className="feature-section py-5">
@@ -59,7 +72,10 @@ const FeatureThisWeek = () => {
         </section>
     );
 
-    if (posts.length === 0) return null;
+    if (startups.length === 0) return null;
+
+    // Duplicate list for infinite scroll if we should scroll
+    const displayStartups = shouldScroll ? [...startups, ...startups] : startups;
 
     return (
         <section className="feature-section py-5">
@@ -68,25 +84,26 @@ const FeatureThisWeek = () => {
                     <h2 className="section-title">Feature <span className="text-highlight">This Week</span></h2>
                 </div>
 
-                <Carousel indicators={false} interval={5000} className="feature-carousel px-4">
-                    {featureSlides.map((slide, slideIndex) => (
-                        <Carousel.Item key={`feature-slide-${slideIndex}`}>
-                            <Row className="g-4">
-                                {slide.map((item) => (
-                                    <Col md={4} sm={6} xs={12} key={`feature-${slideIndex}-${item.id}`} className="d-flex align-items-stretch">
-                                        <Card className="feature-card border-0 text-white w-100">
-                                            <div className="feature-img-container">
-                                                <img src={item.image} alt="" className="feature-bg-blur" aria-hidden="true" />
-                                                <Card.Img src={item.image} alt={item.title} className="feature-img-main" />
-                                            </div>
-
-                                        </Card>
-                                    </Col>
-                                ))}
-                            </Row>
-                        </Carousel.Item>
-                    ))}
-                </Carousel>
+                <div className={`ftw-viewport ${shouldScroll ? 'ftw-scrollable' : 'ftw-static'}`}>
+                    <div className="ftw-track" ref={shouldScroll ? trackRef : null}>
+                        {displayStartups.map((item, idx) => (
+                            <div
+                                className="ftw-card"
+                                key={`${item.id}-${idx}`}
+                                onClick={() => navigate(`/startup/${item.id}`)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={e => e.key === 'Enter' && navigate(`/startup/${item.id}`)}
+                            >
+                                <div className="feature-img-container">
+                                    <img src={item.image} alt="" className="feature-bg-blur" aria-hidden="true" />
+                                    <img src={item.image} alt={item.title} className="feature-img-main" />
+                                    <div className="feature-name-overlay">{item.title}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </Container>
         </section>
     );

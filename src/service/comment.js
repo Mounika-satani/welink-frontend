@@ -13,14 +13,14 @@ export const getComments = async (post_id, user_id = null) => {
 /**
  * Post a new text comment on a post
  */
-export const addComment = async (token, post_id, content) => {
+export const addComment = async (token, post_id, content, parent_id = null) => {
     const res = await fetch(`${API_URL}/comments`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ post_id, content }),
+        body: JSON.stringify({ post_id, content, parent_id }),
     });
     if (!res.ok) {
         const err = await res.json().catch(() => ({ error: res.statusText }));
@@ -92,3 +92,21 @@ export const restoreComment = async (token, comment_id) => {
     return res.json();
 };
 
+/**
+ * Edit an existing comment
+ */
+export const updateComment = async (token, comment_id, content) => {
+    const res = await fetch(`${API_URL}/comments/${comment_id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error || 'Failed to update comment');
+    }
+    return res.json();
+};

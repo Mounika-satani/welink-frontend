@@ -32,6 +32,24 @@ export const getStartupPosts = async (startupId) => {
 };
 
 /**
+ * Tracks a unique view for a specific post
+ * @param {string} token - Optional token
+ * @param {string} postId 
+ */
+export const trackPostView = async (token, postId) => {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_URL}/posts/${postId}/view`, {
+        method: 'POST',
+        headers
+    });
+    if (!res.ok) throw new Error('Failed to track post view');
+    return res.json();
+};
+
+
+/**
  * Fetches all approved posts from all startups (Global Feed)
  * @param {string} token - Optional token to personalize feed (e.g. exclude own posts)
  */
@@ -45,6 +63,21 @@ export const getAllPosts = async (token) => {
     if (!res.ok) throw new Error('Failed to fetch global post feed');
     return res.json();
 };
+
+/**
+ * Fetches the top trending posts across the platform
+ */
+export const getTrendingPosts = async (token) => {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_URL}/posts/trending`, {
+        headers
+    });
+    if (!res.ok) throw new Error('Failed to fetch trending posts');
+    return res.json();
+};
+
 
 /**
  * Updates an existing startup post (supports multiple new media uploads).

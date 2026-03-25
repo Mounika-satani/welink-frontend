@@ -9,24 +9,57 @@
     font-weight: 700;
 }
 
-.feature-card {
-    border-radius: 20px;
-    overflow: hidden;
-    height: 260px !important;
-    /* Forces all cards to be this height */
-    width: 100%;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: #000;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+.text-highlight {
+    color: #ec4899;
 }
 
+/* ── Viewport (clips overflow for scroll) ── */
+.ftw-viewport {
+    overflow: hidden;
+    padding: 0 16px;
+}
+
+/* ── Track (flex row of cards) ── */
+.ftw-track {
+    display: flex;
+    gap: 20px;
+    will-change: transform;
+}
+
+/* Static: 3 columns, no overflow */
+.ftw-static .ftw-track {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    transform: none !important;
+}
+
+/* Scrollable: fixed card width so 3 are visible at a time */
+.ftw-scrollable .ftw-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+}
+
+/* ── Card ── */
+.ftw-card {
+    border-radius: 20px;
+    overflow: hidden;
+    height: 260px;
+    position: relative;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.ftw-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Image layer (blurred backdrop + sharp main) ── */
 .feature-img-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: #000;
     overflow: hidden;
     display: flex;
@@ -41,49 +74,54 @@
     width: 120%;
     height: 120%;
     object-fit: cover;
-    filter: blur(20px) brightness(0.5);
-    /* Strong blur and darkening */
+    filter: blur(20px) brightness(0.45);
     z-index: 0;
 }
 
 .feature-img-main {
     position: relative;
     z-index: 1;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    /* Full sharp image */
-    background: transparent !important;
-    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: transparent;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.feature-card:hover .feature-img-main {
-    transform: scale(1.03);
-    /* Subtle pop on hover */
+.ftw-card:hover .feature-img-main {
+    transform: scale(1.08);
 }
 
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+.feature-name-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px 15px 15px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    z-index: 5;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-
-
-.feature-carousel .carousel-control-prev,
-.feature-carousel .carousel-control-next {
-    width: 4%;
-}
-
-.feature-carousel .carousel-control-prev-icon,
-.feature-carousel .carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    padding: 15px;
-    background-size: 50%, 50%;
+.ftw-card:hover .feature-name-overlay {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
-    .feature-card {
-        height: 220px;
+    .ftw-card {
+        height: 200px;
+    }
+
+    .ftw-static .ftw-track {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ftw-scrollable .ftw-card {
+        flex: 0 0 80%;
     }
 }

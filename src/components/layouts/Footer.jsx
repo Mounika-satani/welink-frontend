@@ -13,10 +13,10 @@ const Footer = () => {
                                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="white" />
                             </svg>
                         </div>
-                        <span className="footer-logo-text">AI Startup <span className="highlight">Discovery</span></span>
+                        <span className="footer-logo-text">We<span className="highlight">Link</span></span>
                     </Link>
                     <p className="footer-description">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vitae sit donec lectus suscipit ut.
+                        A full-stack incubation ecosystem supporting startups from idea validation to growth — connecting founders with capital, mentorship, and opportunity.
                     </p>
                     <div className="social-links">
                         <a href="#" className="social-link" aria-label="Facebook">
@@ -37,29 +37,29 @@ const Footer = () => {
                 {/* Links Sections */}
                 <div className="footer-column">
                     <h3 className="footer-heading">Platform</h3>
-                    <Link to="/discover" className="footer-link">Discover startups</Link>
-                    <Link to="/submit" className="footer-link">Submit your startup</Link>
-                    <Link to="/trending" className="footer-link">Trending the week</Link>
+                    <Link to="/discover" className="footer-link">Discover Startups</Link>
+                    <Link to="/submit-startup" className="footer-link">Submit Your Startup</Link>
+                    <Link to="/trending" className="footer-link">Trending This Week</Link>
                     <Link to="/about" className="footer-link">About</Link>
                 </div>
                 <div className="footer-column">
                     <h3 className="footer-heading">Company</h3>
                     <Link to="/about" className="footer-link">About Us</Link>
-                    <Link to="/contact" className="footer-link">Contact</Link>
-                    <Link to="/careers" className="footer-link">Careers</Link>
+                    <Link to="/faq" className="footer-link">FAQ</Link>
                 </div>
                 <div className="footer-column">
                     <h3 className="footer-heading">Legal</h3>
                     <Link to="/privacy" className="footer-link">Privacy Policy</Link>
-                    <Link to="/terms" className="footer-link">Terms of service</Link>
-                    <Link to="/cookies" className="footer-link">Cookie policy</Link>
+                    <Link to="/terms" className="footer-link">Terms of Service</Link>
+                    <Link to="/cookies" className="footer-link">Cookie Policy</Link>
                 </div>
             </div>
 
             <div className="footer-bottom">
-                <p>© 2026 AI Startup Discovery. All right reserved.</p>
+                <p>© 2026 WeLink. All rights reserved.</p>
             </div>
         </footer>
+
     );
 };
 

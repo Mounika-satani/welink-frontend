@@ -123,22 +123,11 @@
 }
 
 .comment-item {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 14px;
-    /* More compact radius */
-    padding: 10px 12px;
-    /* Reduced from 12px 14px */
+    background: transparent;
+    padding: 8px 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    /* Reduced from 8px */
-    transition: all 0.2s ease;
-}
-
-.comment-item:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.03);
+    gap: 4px;
 }
 
 .comment-header {

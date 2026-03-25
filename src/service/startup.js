@@ -105,7 +105,9 @@ export const getTrendingStartups = async (limit = 8) => {
 export const updateStartup = async (token, startupId, data, logoFile = null, certFile = null, bannerFile = null) => {
     const fd = new FormData();
     Object.entries(data).forEach(([k, v]) => {
-        if (v !== null && v !== undefined && v !== '') fd.append(k, v);
+        if (v !== null && v !== undefined) {
+            fd.append(k, v);
+        }
     });
     if (logoFile) fd.append('logo', logoFile);
     if (certFile) fd.append('incorporation_certificate', certFile);

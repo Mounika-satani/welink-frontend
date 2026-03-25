@@ -55,7 +55,11 @@ const Discover = () => {
     // Fetch initial categories
     useEffect(() => {
         getCategories()
-            .then(data => setCategories(["All", ...data.map(c => c.name)]))
+            .then(data => {
+                // Just fetch the categories where type is INDUSTRY
+                const industryCategories = data.filter(c => c.type === 'INDUSTRY');
+                setCategories(["All", ...industryCategories.map(c => c.name)]);
+            })
             .catch(err => console.error('Error fetching categories:', err));
     }, []);
 
@@ -163,8 +167,12 @@ const Discover = () => {
                                 </div>
                             ) : (
                                 <>
-                                    {startups.map((startup) => (
-                                        <div key={startup.id} className="startup-list-card">
+                                    {startups.map((startup, idx) => (
+                                        <Link
+                                            to={`/startup/${startup.id}`}
+                                            key={startup.id}
+                                            className="startup-list-card text-decoration-none"
+                                        >
                                             <div className="card-img-wrapper">
                                                 <img
                                                     src={startup.logo_url || LOGO_FALLBACK}
@@ -178,11 +186,23 @@ const Discover = () => {
                                                     <div className="badge-group">
                                                         {startup.is_featured && <span className="custom-badge badge-featured">Featured</span>}
                                                         {startup.status === 'APPROVED' && <span className="custom-badge badge-verified">Verified</span>}
-                                                        <span className="badge-category">{startup.industry?.name}</span>
+
+                                                        {/* Show all categories associated with the startup */}
+                                                        {(() => {
+                                                            const cats = new Set();
+                                                            if (startup.industry?.name) cats.add(startup.industry.name);
+                                                            if (startup.industries) startup.industries.forEach(i => cats.add(i.name));
+
+                                                            return Array.from(cats).map((catName, i) => (
+                                                                <span key={i} className="badge-category">
+                                                                    {catName}
+                                                                </span>
+                                                            ));
+                                                        })()}
                                                     </div>
-                                                    <Link to={`/startup/${startup.id}`} className="arrow-link">
+                                                    <div className="arrow-link">
                                                         <ArrowUpRight />
-                                                    </Link>
+                                                    </div>
                                                 </div>
 
                                                 <div className="mb-3">
@@ -205,7 +225,7 @@ const Discover = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
 
                                     {hasMore && (

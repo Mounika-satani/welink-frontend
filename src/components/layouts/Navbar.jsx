@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
-import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, Button, Dropdown, NavDropdown } from 'react-bootstrap';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { API_URL } from '../../service/api';
 import CreatePostModal from '../CreatePostModal';
 import './Navbar.css';
 
 const AppNavbar = () => {
     const { user, dbUser, triggerLogin, logout } = useAuth();
     const [showUploadModal, setShowUploadModal] = useState(false);
+    const [services, setServices] = useState([]);
+
+    React.useEffect(() => {
+        fetch(`${API_URL}/services`)
+            .then(res => res.json())
+            .then(data => setServices(Array.isArray(data) ? data : []))
+            .catch(() => setServices([]));
+    }, []);
 
     return (
         <>
@@ -30,7 +39,14 @@ const AppNavbar = () => {
                             <Nav.Link as={NavLink} to="/feed">Feed</Nav.Link>
                             <Nav.Link as={NavLink} to="/discover">Discover</Nav.Link>
                             <Nav.Link as={NavLink} to="/industries">Industries</Nav.Link>
-                            <Nav.Link as={NavLink} to="/help">Help</Nav.Link>
+                            <Nav.Link as={NavLink} to="/faq">FAQ</Nav.Link>
+                            <NavDropdown title="Financing" id="financing-nav-dropdown" menuVariant="dark">
+                                {services.map(service => (
+                                    <NavDropdown.Item key={service.id} as={Link} to={`/help?service=${service.id}`}>
+                                        {service.name}
+                                    </NavDropdown.Item>
+                                ))}
+                            </NavDropdown>
                         </Nav>
 
                         <div className="d-flex align-items-center gap-3 navbar-actions">
