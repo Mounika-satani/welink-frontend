@@ -16,8 +16,8 @@
 .banner-ticker-content {
     display: flex;
     white-space: nowrap;
-    animation: ticker-scrolling 80s linear infinite;
-    gap: 120px;
+    animation: ticker-scrolling 30s linear infinite;
+    gap: 40px;
     padding-left: 50px;
 }
 
@@ -26,6 +26,11 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1.5px;
+}
+
+.ticker-dot {
+    margin-left: 40px;
+    opacity: 0.6;
 }
 
 .banner-ticker-container:hover .banner-ticker-content {

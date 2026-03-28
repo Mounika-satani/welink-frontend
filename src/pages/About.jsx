@@ -8,7 +8,7 @@ const About = () => {
 
                 {/* Hero */}
                 <div className="legal-hero">
-                    <div className="legal-badge">About WeLink</div>
+                    <div className="legal-badge">About CommunEdge</div>
                     <h1 className="legal-title">
                         Built for Founders,<br />
                         <span className="highlight">Designed for Growth</span>

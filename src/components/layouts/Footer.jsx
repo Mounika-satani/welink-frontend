@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
+import logotext from '../../assets/logotext.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -8,12 +10,16 @@ const Footer = () => {
             <div className="footer-content">
                 <div className="footer-brand">
                     <Link to="/" className="footer-logo">
-                        <div className="logo-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="white" />
-                            </svg>
-                        </div>
-                        <span className="footer-logo-text">We<span className="highlight">Link</span></span>
+                        <img
+                            src={logo}
+                            alt="CommunEdge Logo"
+                            style={{ height: '32px', marginRight: '10px' }}
+                        />
+                        <img
+                            src={logotext}
+                            alt="CommunEdge"
+                            style={{ height: '26px' }}
+                        />
                     </Link>
                     <p className="footer-description">
                         A full-stack incubation ecosystem supporting startups from idea validation to growth — connecting founders with capital, mentorship, and opportunity.
@@ -56,7 +62,12 @@ const Footer = () => {
             </div>
 
             <div className="footer-bottom">
-                <p>© 2026 WeLink. All rights reserved.</p>
+                <p>
+                    © 2026 CommunEdge. All rights reserved.
+                    <span className="by-tagline">
+                        (by <a href="https://www.weiteredge.com/" target="_blank" rel="noopener noreferrer">Weiteredge</a>)
+                    </span>
+                </p>
             </div>
         </footer>
 

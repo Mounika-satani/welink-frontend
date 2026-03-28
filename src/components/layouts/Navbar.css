@@ -31,8 +31,15 @@
     font-weight: 500;
     font-size: 1.05rem;
     transition: color 0.3s ease;
-    margin: 0 15px;
+    margin: 0 !important;
+    padding: 0.6rem 0 !important;
     position: relative;
+    letter-spacing: 0.4px !important;
+}
+
+.nav-main-links {
+    gap: 2.8rem !important;
+    align-items: center !important;
 }
 
 .navbar-custom .nav-link:hover,
@@ -93,8 +100,15 @@
 }
 
 @media (max-width: 991px) {
+    .nav-main-links {
+        gap: 1rem !important;
+        align-items: flex-start;
+        padding: 1rem 0;
+    }
+
     .navbar-custom .nav-link {
-        margin: 10px 0;
+        margin: 5px 0;
+        padding: 8px 0;
     }
 
     .navbar-actions {

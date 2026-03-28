@@ -10,12 +10,11 @@ const Banner = () => {
         const fetchBanners = async () => {
             try {
                 const categories = await getAllCategories();
-                // Admin can create multiple categories with type: 'BANNER' to rotate images
                 const bannerCats = categories.filter(c =>
                     c.type === 'BANNER' ||
                     c.name.toUpperCase() === 'BANNER' ||
                     c.name.toUpperCase() === 'HOME'
-                ).map(c => c.imageUrl).filter(Boolean);
+                ).map(c => ({ url: c.imageUrl, description: c.description })).filter(b => b.url);
 
                 if (bannerCats.length > 0) {
                     setBanners(bannerCats);
@@ -32,33 +31,39 @@ const Banner = () => {
 
         const interval = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-        }, 5000); // 5 seconds rotation
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [banners]);
 
     return (
         <section className="banner-section">
-            <div className="banner-background-container">
-                {banners.length > 0 ? (
-                    banners.map((url, index) => (
-                        <div
-                            key={`${url}-${index}`}
-                            className={`banner-slide ${index === currentIndex ? 'active' : ''}`}
-                            style={{ backgroundImage: `linear-gradient(to bottom, rgba(15, 15, 25, 0.4) 0%, var(--bg-main) 100%), url(${url})` }}
-                        />
-                    ))
-                ) : (
-                    <div className="banner-slide active default-background" />
-                )}
+            <div className="banner-carousel-container">
+                <div
+                    className="banner-track"
+                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                >
+                    {banners.length > 0 ? (
+                        banners.map((banner, index) => (
+                            <div
+                                key={`${banner.url}-${index}`}
+                                className="banner-slide"
+                                style={{
+                                    backgroundImage: `linear-gradient(to bottom, rgba(10, 10, 20, 0.45) 0%, var(--bg-main) 100%), url(${banner.url})`
+                                }}
+                            />
+                        ))
+                    ) : (
+                        <div className="banner-slide default-background" />
+                    )}
+                </div>
             </div>
 
-            {/* <div className="banner-content">
-                <h1 className="banner-title">
-                    Discover the <br />
-                    <span className="highlight">Future of AI</span>
-                </h1>
-            </div> */}
+            {banners.length > 0 && banners[currentIndex]?.description && (
+                <div className="banner-content" key={currentIndex}>
+                    <p className="banner-description">{banners[currentIndex].description}</p>
+                </div>
+            )}
         </section>
     );
 };

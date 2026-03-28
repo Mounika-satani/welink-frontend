@@ -23,14 +23,14 @@ const CreatePostHeader = ({ dbUser, onOpenModal }) => {
                     )}
                 </Link>
 
-                <div className="li-pill-input" onClick={onOpenModal}>
-                    Start your story...
-                </div>
-
-                <div className="li-pill-actions">
-                    <button className="li-pill-btn" title="News" onClick={onOpenModal}>
-                        <svg viewBox="0 0 24 24"><path d="M17 3H7a4 4 0 00-4 4v10a4 4 0 004 4h10a4 4 0 004-4V7a4 4 0 00-4-4zm-2 12H9v-2h6v2zm0-4H9V9h6v2z" /></svg>
-                    </button>
+                <div className="li-pill-input" onClick={onOpenModal} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Start your story...</span>
+                    <div className="li-pill-add-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '8px', marginRight: '6px' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>

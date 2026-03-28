@@ -1014,7 +1014,7 @@ const SubmitStartup = () => {
                                 {editMode ? 'Edit Your Startup' : 'Submit Your Startup'}
                             </h6>
                             <h1 className="display-6 fw-bold mb-3">
-                                {editMode ? 'Update Your Startup Details' : 'Get Featured on WeLink'}
+                                {editMode ? 'Update Your Startup Details' : 'Get Featured on CommunEdge'}
                             </h1>
                             <p className="text-muted">
                                 {editMode

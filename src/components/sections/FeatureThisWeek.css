@@ -26,17 +26,63 @@
     will-change: transform;
 }
 
-/* Static: 3 columns, no overflow */
-.ftw-static .ftw-track {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    transform: none !important;
+.ftw-card {
+    flex: 0 0 calc((100% - 40px) / 3);
 }
 
-/* Scrollable: fixed card width so 3 are visible at a time */
-.ftw-scrollable .ftw-card {
-    flex: 0 0 calc((100% - 40px) / 3);
+.ftw-carousel-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.ftw-side-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 30;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.ftw-side-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.1);
+    border-color: #1DA8FA;
+    color: #1DA8FA;
+}
+
+.ftw-side-btn:active {
+    transform: translateY(-50%) scale(0.9);
+}
+
+.ftw-side-btn.prev {
+    left: -32px;
+    /* Pull it slightly out of viewport for a premium overlay look */
+}
+
+.ftw-side-btn.next {
+    right: -32px;
+}
+
+@media (max-width: 1100px) {
+    .ftw-side-btn.prev {
+        left: 10px;
+    }
+
+    .ftw-side-btn.next {
+        right: 10px;
+    }
 }
 
 /* ── Card ── */
@@ -114,14 +160,12 @@
 
 @media (max-width: 768px) {
     .ftw-card {
-        height: 200px;
+        height: 220px;
+        flex: 0 0 100%;
     }
 
-    .ftw-static .ftw-track {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .ftw-scrollable .ftw-card {
-        flex: 0 0 80%;
+    .ftw-controls {
+        display: none;
+        /* Hide controls or make them smaller for swipe? Let's keep them and maybe simplify */
     }
 }

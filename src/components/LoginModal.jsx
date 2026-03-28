@@ -40,7 +40,7 @@ const LoginModal = () => {
                 <button className="close-button" onClick={() => setShowLoginModal(false)}>×</button>
 
                 <div className="login-header">
-                    <h2>Welcome to WeLink</h2>
+                    <h2>Welcome to CommunEdge</h2>
                     <p>Connect, Collaborate, Create.</p>
                 </div>
 

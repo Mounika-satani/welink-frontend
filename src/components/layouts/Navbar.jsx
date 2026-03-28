@@ -4,6 +4,8 @@ import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { API_URL } from '../../service/api';
 import CreatePostModal from '../CreatePostModal';
+import logo from '../../assets/logo.png';
+import logotext from '../../assets/logotext.png';
 import './Navbar.css';
 
 const AppNavbar = () => {
@@ -22,24 +24,27 @@ const AppNavbar = () => {
         <>
             <Navbar expand="lg" className="navbar-custom" variant="dark">
                 <Container fluid className="px-5">
-                    <Navbar.Brand as={Link} to="/">
-                        <div className="logo-icon me-2">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="white" />
-                            </svg>
-                        </div>
-                        AI Startup
+                    <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+                        <img
+                            src={logo}
+                            alt="CommunEdge Logo"
+                            style={{ height: '32px', marginRight: '10px' }}
+                        />
+                        <img
+                            src={logotext}
+                            alt="CommunEdge"
+                            style={{ height: '26px' }}
+                        />
                     </Navbar.Brand>
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
                     <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="mx-auto">
+                        <Nav className="mx-auto nav-main-links">
                             <Nav.Link as={NavLink} to="/" end>Home</Nav.Link>
                             <Nav.Link as={NavLink} to="/feed">Feed</Nav.Link>
                             <Nav.Link as={NavLink} to="/discover">Discover</Nav.Link>
                             <Nav.Link as={NavLink} to="/industries">Industries</Nav.Link>
-                            <Nav.Link as={NavLink} to="/faq">FAQ</Nav.Link>
                             <NavDropdown title="Financing" id="financing-nav-dropdown" menuVariant="dark">
                                 {services.map(service => (
                                     <NavDropdown.Item key={service.id} as={Link} to={`/help?service=${service.id}`}>

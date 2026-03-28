@@ -61,7 +61,7 @@ const CookiePolicy = () => {
                 <div className="legal-section">
                     <div className="legal-section-title"><span className="section-num">6</span> Contact</div>
                     <p>
-                        For queries or requests: <a href="mailto:weiteredge240@gmail.com" className="legal-contact-link">weiteredge240@gmail.com</a>
+                        For queries or requests: <a href="mailto:support@communedge.com" className="legal-contact-link">support@communedge.com</a>
                     </p>
                 </div>
 

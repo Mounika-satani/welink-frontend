@@ -1,30 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Container, Badge } from 'react-bootstrap';
-import { getAllCategories } from '../../service/category';
+import ads1 from '../../assets/ads1.jpeg';
+import ads2 from '../../assets/ads2.jpeg';
+import ads3 from '../../assets/ads3.jpeg';
 import './FeaturedStartups.css';
 
 const FeaturedStartups = () => {
-    const [advertisements, setAdvertisements] = useState([]);
-
-    useEffect(() => {
-        const fetchAds = async () => {
-            try {
-                const data = await getAllCategories();
-                if (Array.isArray(data)) {
-                    const ads = data.filter(c =>
-                        c.type === 'ADVERTISEMENT' ||
-                        c.name.toUpperCase() === 'ADVERTISEMENT'
-                    ).slice(0, 3); // Take exactly 3 for the new layout
-                    setAdvertisements(ads);
-                }
-            } catch (err) {
-                console.error('FeaturedAds fetch error:', err);
-            }
-        };
-        fetchAds();
-    }, []);
-
-    if (advertisements.length === 0) return null;
+    // Static data as requested, using local image assets
+    const advertisements = [
+        {
+            id: 'static-1',
+            name: 'Innovating the Future',
+            description: 'Leading the way in next-generation AI and machine learning solutions.',
+            imageUrl: ads1,
+            industry: 'Technology'
+        },
+        {
+            id: 'static-2',
+            name: 'Sustainable Growth',
+            description: 'Green energy initiatives that power the modern world.',
+            imageUrl: ads2,
+            industry: 'Energy'
+        },
+        {
+            id: 'static-3',
+            name: 'Digital Evolution',
+            description: 'Transforming businesses with cutting-edge software development.',
+            imageUrl: ads3,
+            industry: 'Software'
+        }
+    ];
 
     return (
         <section className="featured-startups-section py-5">
@@ -37,7 +42,7 @@ const FeaturedStartups = () => {
                 <div className="grid-layout">
                     {advertisements.map((ad, idx) => (
                         <div
-                            key={ad.id || idx}
+                            key={ad.id}
                             className={`startup-card ${idx === 0 ? 'card-large' : 'card-small'}`}
                         >
                             <img
@@ -48,13 +53,13 @@ const FeaturedStartups = () => {
                             <div className="card-overlay">
                                 <div className="card-tags">
                                     <Badge className="custom-badge glass-badge">FEATURED</Badge>
-                                    {idx === 0 && ad.industry && (
+                                    {ad.industry && (
                                         <Badge className="custom-badge glass-badge text-uppercase">{ad.industry}</Badge>
                                     )}
                                 </div>
                                 <div className="card-content">
                                     <h3 className="startup-name">{ad.name}</h3>
-                                    <p className="startup-description">{ad.description}</p>
+                                    <p className="startup-description text-truncate-2">{ad.description}</p>
                                 </div>
                             </div>
                         </div>

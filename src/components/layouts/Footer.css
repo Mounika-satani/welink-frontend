@@ -114,6 +114,25 @@
 }
 
 
+.by-tagline {
+    margin-left: 8px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.by-tagline a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.by-tagline a:hover {
+    color: var(--color-text-highlight);
+    text-decoration: underline;
+    opacity: 1;
+}
+
 @media (max-width: 768px) {
     .footer {
         padding: 40px 20px;

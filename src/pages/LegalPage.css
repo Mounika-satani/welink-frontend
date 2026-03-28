@@ -6,15 +6,15 @@
 }
 
 .legal-page .legal-container {
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 40px;
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────────────── */
 .legal-hero {
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 40px;
 }
 
 .legal-badge {
@@ -28,14 +28,14 @@
     text-transform: uppercase;
     padding: 7px 20px;
     border-radius: 100px;
-    margin-bottom: 28px;
+    margin-bottom: 16px;
 }
 
 .legal-title {
     font-size: clamp(2.2rem, 5vw, 3.4rem);
     font-weight: 800;
     color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     line-height: 1.15;
     letter-spacing: -0.5px;
 }
@@ -50,7 +50,7 @@
 .legal-subtitle {
     font-size: 1.1rem;
     color: #777;
-    max-width: 640px;
+    max-width: 1000px;
     margin: 0 auto;
     line-height: 1.8;
 }

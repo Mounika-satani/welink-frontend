@@ -89,7 +89,7 @@ const Help = () => {
                             </div>
                             <div>
                                 <div className="help-contact-label">Email</div>
-                                <div className="help-contact-value">support@welink.com</div>
+                                <div className="help-contact-value">support@communedge.com</div>
                             </div>
                         </div>
                         <div className="help-contact-item">

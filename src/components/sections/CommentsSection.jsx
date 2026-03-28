@@ -83,6 +83,7 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
     const [replyText, setReplyText] = useState('');
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState('');
+    const [errorMsg, setErrorMsg] = useState(null);
 
     const isOwner = !!(dbUser && startupOwnerId && dbUser.id === startupOwnerId);
 
@@ -103,6 +104,7 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
         const content = parentId ? replyText : text;
         if (!content.trim() || posting) return;
         setPosting(true);
+        setErrorMsg(null);
         try {
             const newComment = await addComment(token, postId, content.trim(), parentId);
             setComments(prev => [newComment, ...prev]);
@@ -114,6 +116,7 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
             }
         } catch (err) {
             console.error('Submit comment error:', err);
+            setErrorMsg(err.message || 'Failed to post comment.');
         } finally {
             setPosting(false);
         }
@@ -161,10 +164,10 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
         }
     };
 
-    /* Edit comment */
     const handleEditSave = async (commentId) => {
         if (!editText.trim() || posting) return;
         setPosting(true);
+        setErrorMsg(null);
         try {
             await updateComment(token, commentId, editText.trim());
             setComments(prev => prev.map(c =>
@@ -174,6 +177,7 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
             setEditText('');
         } catch (err) {
             console.error('Edit comment error:', err);
+            setErrorMsg(err.message || 'Failed to update comment.');
         } finally {
             setPosting(false);
         }
@@ -402,6 +406,11 @@ const CommentsSection = ({ postId, dbUser, token, startupOwnerId }) => {
     return (
         <div className="comments-section">
             <div className="comments-body">
+                {errorMsg && (
+                    <div style={{ padding: '10px 14px', marginBottom: '16px', background: 'rgba(239, 68, 68, 0.15)', borderLeft: '4px solid #ef4444', borderRadius: '4px', color: '#fca5a5', fontSize: '0.9rem' }}>
+                        {errorMsg}
+                    </div>
+                )}
                 {/* Input */}
                 {dbUser ? (
                     <div className="comment-input-row">

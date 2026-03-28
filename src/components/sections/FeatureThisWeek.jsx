@@ -8,17 +8,12 @@ const FeatureThisWeek = () => {
     const navigate = useNavigate();
     const [startups, setStartups] = useState([]);
     const [loading, setLoading] = useState(true);
-    const trackRef = useRef(null);
-    const animFrameRef = useRef(null);
-    const posRef = useRef(0);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
-        // Fetch newly added startups (limit 6)
-        getAllStartups(1, 6)
+        getAllStartups(1, 8)
             .then(data => {
                 if (data && Array.isArray(data.startups)) {
-                    // Startups are typically sorted by creation date or trending score
-                    // We just take the top 6 from the first page
                     const mapped = data.startups.map(s => ({
                         id: s.id,
                         title: s.name,
@@ -31,38 +26,36 @@ const FeatureThisWeek = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    const shouldScroll = startups.length > 3;
+    const handleNext = () => {
+        if (isAnimating || startups.length <= 1) return;
 
-    // Auto-scroll via RAF
-    useEffect(() => {
-        if (!shouldScroll || !trackRef.current) return;
-        const track = trackRef.current;
-        const SPEED = 1.0;
+        setIsAnimating(true);
+        // Wait for CSS transition (0.6s) to finish before shifting array
+        setTimeout(() => {
+            setStartups(prev => {
+                const [first, ...rest] = prev;
+                return [...rest, first];
+            });
+            setIsAnimating(false);
+        }, 600);
+    };
 
-        const step = () => {
-            posRef.current += SPEED;
-            const halfWidth = track.scrollWidth / 2;
-            if (posRef.current >= halfWidth) posRef.current = 0;
-            track.style.transform = `translateX(-${posRef.current}px)`;
-            animFrameRef.current = requestAnimationFrame(step);
-        };
+    const handlePrev = () => {
+        if (isAnimating || startups.length <= 1) return;
 
-        animFrameRef.current = requestAnimationFrame(step);
-        const pause = () => cancelAnimationFrame(animFrameRef.current);
-        const resume = () => { animFrameRef.current = requestAnimationFrame(step); };
+        setIsAnimating(true);
+        // Shift array immediately but we'll need to handle the visual "jump"
+        // For a simpler "same data" loop, we shift the array and reset position
+        setStartups(prev => {
+            const last = prev[prev.length - 1];
+            const rest = prev.slice(0, -1);
+            return [last, ...rest];
+        });
 
-        const container = track.parentElement;
-        container.addEventListener('mouseenter', pause);
-        container.addEventListener('mouseleave', resume);
-
-        return () => {
-            cancelAnimationFrame(animFrameRef.current);
-            if (container) {
-                container.removeEventListener('mouseenter', pause);
-                container.removeEventListener('mouseleave', resume);
-            }
-        };
-    }, [shouldScroll, startups]);
+        setTimeout(() => {
+            setIsAnimating(false);
+        }, 600);
+    };
 
     if (loading) return (
         <section className="feature-section py-5">
@@ -74,35 +67,54 @@ const FeatureThisWeek = () => {
 
     if (startups.length === 0) return null;
 
-    // Duplicate list for infinite scroll if we should scroll
-    const displayStartups = shouldScroll ? [...startups, ...startups] : startups;
+    const cardsToShow = window.innerWidth > 768 ? 3 : 1;
+    const offset = isAnimating ? (100 / cardsToShow) : 0;
 
     return (
         <section className="feature-section py-5">
             <Container>
-                <div className="d-flex justify-content-between align-items-center mb-4 px-4">
+                <div className="d-flex justify-content-between align-items-center mb-4 px-2">
                     <h2 className="section-title">Feature <span className="text-highlight">This Week</span></h2>
                 </div>
 
-                <div className={`ftw-viewport ${shouldScroll ? 'ftw-scrollable' : 'ftw-static'}`}>
-                    <div className="ftw-track" ref={shouldScroll ? trackRef : null}>
-                        {displayStartups.map((item, idx) => (
-                            <div
-                                className="ftw-card"
-                                key={`${item.id}-${idx}`}
-                                onClick={() => navigate(`/startup/${item.id}`)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={e => e.key === 'Enter' && navigate(`/startup/${item.id}`)}
-                            >
-                                <div className="feature-img-container">
-                                    <img src={item.image} alt="" className="feature-bg-blur" aria-hidden="true" />
-                                    <img src={item.image} alt={item.title} className="feature-img-main" />
-                                    <div className="feature-name-overlay">{item.title}</div>
+                <div className="ftw-carousel-wrapper">
+                    <div className="ftw-viewport">
+                        <div
+                            className="ftw-track"
+                            style={{
+                                transform: `translateX(-${offset}%)`,
+                                transition: isAnimating ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none'
+                            }}
+                        >
+                            {startups.map((item, idx) => (
+                                <div
+                                    className="ftw-card"
+                                    key={`${item.id}-${item.title}`} // Uses title to maintain identity during reorder
+                                    onClick={() => navigate(`/startup/${item.id}`)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === 'Enter' && navigate(`/startup/${item.id}`)}
+                                >
+                                    <div className="feature-img-container">
+                                        <img src={item.image} alt="" className="feature-bg-blur" aria-hidden="true" />
+                                        <img src={item.image} alt={item.title} className="feature-img-main" />
+                                        <div className="feature-name-overlay">{item.title}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
+
+                    {startups.length > cardsToShow && (
+                        <>
+                            <button className="ftw-side-btn prev" onClick={handlePrev} aria-label="Previous">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+                            </button>
+                            <button className="ftw-side-btn next" onClick={handleNext} aria-label="Next">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+                            </button>
+                        </>
+                    )}
                 </div>
             </Container>
         </section>
