@@ -1,33 +1,39 @@
 import React from 'react';
-import { Container, Badge } from 'react-bootstrap';
-import ads1 from '../../assets/ads1.jpeg';
-import ads2 from '../../assets/ads2.jpeg';
-import ads3 from '../../assets/ads3.jpeg';
+import { Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import spotlight1 from '../../assets/spotlight1.png';
+import spotlight2 from '../../assets/spotlight2.png';
+import spotlight3 from '../../assets/spotlight3.png';
 import './FeaturedStartups.css';
 
 const FeaturedStartups = () => {
-    // Static data as requested, using local image assets
+    const navigate = useNavigate();
+
+    // Premium Spotlight content using high-quality assets
     const advertisements = [
         {
             id: 'static-1',
             name: 'Innovating the Future',
-            description: 'Leading the way in next-generation AI and machine learning solutions.',
-            imageUrl: ads1,
-            industry: 'Technology'
+            description: 'Experience next-generation AI and machine learning solutions that redefine industrial productivity.',
+            imageUrl: spotlight1,
+            industry: 'Technology',
+            accent: '#0ea5e9' // Sky blue accent
         },
         {
             id: 'static-2',
             name: 'Sustainable Growth',
-            description: 'Green energy initiatives that power the modern world.',
-            imageUrl: ads2,
-            industry: 'Energy'
+            description: 'Powering the modern world with breakthrough green energy and eco-conscious engineering.',
+            imageUrl: spotlight2,
+            industry: 'Energy',
+            accent: '#10b981' // Emerald accent
         },
         {
             id: 'static-3',
             name: 'Digital Evolution',
-            description: 'Transforming businesses with cutting-edge software development.',
-            imageUrl: ads3,
-            industry: 'Software'
+            description: 'Transforming businesses into digital powerhouses with high-performance software architecture.',
+            imageUrl: spotlight3,
+            industry: 'Software',
+            accent: '#8b5cf6' // Violet accent
         }
     ];
 
@@ -44,6 +50,10 @@ const FeaturedStartups = () => {
                         <div
                             key={ad.id}
                             className={`startup-card ${idx === 0 ? 'card-large' : 'card-small'}`}
+                            style={{ '--accent-color': ad.accent }}
+                            onClick={() => navigate('/discover')}
+                            role="button"
+                            tabIndex={0}
                         >
                             <img
                                 src={ad.imageUrl}
@@ -51,15 +61,13 @@ const FeaturedStartups = () => {
                                 className="card-bg-img"
                             />
                             <div className="card-overlay">
-                                <div className="card-tags">
-                                    <Badge className="custom-badge glass-badge">FEATURED</Badge>
-                                    {ad.industry && (
-                                        <Badge className="custom-badge glass-badge text-uppercase">{ad.industry}</Badge>
-                                    )}
-                                </div>
                                 <div className="card-content">
                                     <h3 className="startup-name">{ad.name}</h3>
-                                    <p className="startup-description text-truncate-2">{ad.description}</p>
+                                    <p className="startup-description">{ad.description}</p>
+                                    <div className="card-action">
+                                        <span>Discover More</span>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7l7 7-7 7" /></svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
